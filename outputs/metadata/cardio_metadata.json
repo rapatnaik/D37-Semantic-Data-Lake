@@ -1,0 +1,460 @@
+{
+    "dataset": "../datasets/cleaned/cardiovascular_cleaned.csv",
+    "row_count": 1000,
+    "column_count": 15,
+    "columns": {
+        "patientid": {
+            "datatype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 1000,
+            "column_sample": [
+                103368,
+                119250,
+                119372,
+                132514,
+                146211
+            ],
+            "statistics": {
+                "min": 103368.0,
+                "max": 9990855.0,
+                "mean": 5048704.412,
+                "median": 4952508.5
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 1000,
+                "statistics": {
+                    "min": 103368,
+                    "max": 9990855,
+                    "mean": 5048704.412,
+                    "median": 4952508.5
+                }
+            }
+        },
+        "age": {
+            "datatype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 61,
+            "column_sample": [
+                53,
+                40,
+                49,
+                43,
+                31
+            ],
+            "statistics": {
+                "min": 20.0,
+                "max": 80.0,
+                "mean": 49.242,
+                "median": 49.0
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 61,
+                "statistics": {
+                    "min": 20,
+                    "max": 80,
+                    "mean": 49.242,
+                    "median": 49.0
+                }
+            }
+        },
+        "gender": {
+            "datatype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 2,
+            "column_sample": [
+                1,
+                1,
+                1,
+                1,
+                1
+            ],
+            "statistics": {
+                "min": 0.0,
+                "max": 1.0,
+                "mean": 0.765,
+                "median": 1.0
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 2,
+                "statistics": {
+                    "min": 0,
+                    "max": 1,
+                    "mean": 0.765,
+                    "median": 1.0
+                }
+            }
+        },
+        "chestpain": {
+            "datatype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 4,
+            "column_sample": [
+                2,
+                0,
+                2,
+                0,
+                1
+            ],
+            "statistics": {
+                "min": 0.0,
+                "max": 3.0,
+                "mean": 0.98,
+                "median": 1.0
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 4,
+                "statistics": {
+                    "min": 0,
+                    "max": 3,
+                    "mean": 0.98,
+                    "median": 1.0
+                }
+            }
+        },
+        "restingBP": {
+            "datatype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 95,
+            "column_sample": [
+                171,
+                94,
+                133,
+                138,
+                199
+            ],
+            "statistics": {
+                "min": 94.0,
+                "max": 200.0,
+                "mean": 151.747,
+                "median": 147.0
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 95,
+                "statistics": {
+                    "min": 94,
+                    "max": 200,
+                    "mean": 151.747,
+                    "median": 147.0
+                }
+            }
+        },
+        "serumcholestrol": {
+            "datatype": "float64",
+            "null_count": 53,
+            "null_percentage": 5.3,
+            "all_missing": false,
+            "distinct_count": 343,
+            "column_sample": [
+                229.0,
+                142.0,
+                295.0,
+                240.0,
+                345.0
+            ],
+            "statistics": {
+                "min": 85.0,
+                "max": 602.0,
+                "mean": 328.87750791974656,
+                "median": 326.0
+            },
+            "sql_profile": {
+                "null_count": 53,
+                "distinct_count": 343,
+                "statistics": {
+                    "min": 85.0,
+                    "max": 602.0,
+                    "mean": 328.87750791974656,
+                    "median": 326.0
+                }
+            }
+        },
+        "fastingbloodsugar": {
+            "datatype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 2,
+            "column_sample": [
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "statistics": {
+                "min": 0.0,
+                "max": 1.0,
+                "mean": 0.296,
+                "median": 0.0
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 2,
+                "statistics": {
+                    "min": 0,
+                    "max": 1,
+                    "mean": 0.296,
+                    "median": 0.0
+                }
+            }
+        },
+        "restingrelectro": {
+            "datatype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 3,
+            "column_sample": [
+                1,
+                1,
+                0,
+                1,
+                2
+            ],
+            "statistics": {
+                "min": 0.0,
+                "max": 2.0,
+                "mean": 0.748,
+                "median": 1.0
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 3,
+                "statistics": {
+                    "min": 0,
+                    "max": 2,
+                    "mean": 0.748,
+                    "median": 1.0
+                }
+            }
+        },
+        "maxheartrate": {
+            "datatype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 129,
+            "column_sample": [
+                147,
+                115,
+                202,
+                153,
+                136
+            ],
+            "statistics": {
+                "min": 71.0,
+                "max": 202.0,
+                "mean": 145.477,
+                "median": 146.0
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 129,
+                "statistics": {
+                    "min": 71,
+                    "max": 202,
+                    "mean": 145.477,
+                    "median": 146.0
+                }
+            }
+        },
+        "exerciseangia": {
+            "datatype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 2,
+            "column_sample": [
+                0,
+                0,
+                1,
+                0,
+                0
+            ],
+            "statistics": {
+                "min": 0.0,
+                "max": 1.0,
+                "mean": 0.498,
+                "median": 0.0
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 2,
+                "statistics": {
+                    "min": 0,
+                    "max": 1,
+                    "mean": 0.498,
+                    "median": 0.0
+                }
+            }
+        },
+        "oldpeak": {
+            "datatype": "float64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 63,
+            "column_sample": [
+                5.3,
+                3.7,
+                5.0,
+                3.2,
+                5.3
+            ],
+            "statistics": {
+                "min": 0.0,
+                "max": 6.2,
+                "mean": 2.7077,
+                "median": 2.4
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 63,
+                "statistics": {
+                    "min": 0.0,
+                    "max": 6.2,
+                    "mean": 2.707700000000001,
+                    "median": 2.4
+                }
+            }
+        },
+        "slope": {
+            "datatype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 4,
+            "column_sample": [
+                3,
+                1,
+                1,
+                2,
+                3
+            ],
+            "statistics": {
+                "min": 0.0,
+                "max": 3.0,
+                "mean": 1.54,
+                "median": 2.0
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 4,
+                "statistics": {
+                    "min": 0,
+                    "max": 3,
+                    "mean": 1.54,
+                    "median": 2.0
+                }
+            }
+        },
+        "noofmajorvessels": {
+            "datatype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 4,
+            "column_sample": [
+                3,
+                1,
+                0,
+                2,
+                2
+            ],
+            "statistics": {
+                "min": 0.0,
+                "max": 3.0,
+                "mean": 1.222,
+                "median": 1.0
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 4,
+                "statistics": {
+                    "min": 0,
+                    "max": 3,
+                    "mean": 1.222,
+                    "median": 1.0
+                }
+            }
+        },
+        "target": {
+            "datatype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 2,
+            "column_sample": [
+                1,
+                0,
+                0,
+                1,
+                1
+            ],
+            "statistics": {
+                "min": 0.0,
+                "max": 1.0,
+                "mean": 0.58,
+                "median": 1.0
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 2,
+                "statistics": {
+                    "min": 0,
+                    "max": 1,
+                    "mean": 0.58,
+                    "median": 1.0
+                }
+            }
+        },
+        "cholesterol_missing": {
+            "datatype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "all_missing": false,
+            "distinct_count": 2,
+            "column_sample": [
+                1,
+                0,
+                0,
+                0,
+                1
+            ],
+            "statistics": {
+                "min": 0.0,
+                "max": 1.0,
+                "mean": 0.053,
+                "median": 0.0
+            },
+            "sql_profile": {
+                "null_count": 0,
+                "distinct_count": 2,
+                "statistics": {
+                    "min": 0,
+                    "max": 1,
+                    "mean": 0.053,
+                    "median": 0.0
+                }
+            }
+        }
+    },
+    "candidate_keys": [
+        "patientid"
+    ]
+}
