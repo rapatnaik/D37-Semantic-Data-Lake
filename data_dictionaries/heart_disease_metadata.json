@@ -1,0 +1,86 @@
+[
+    {
+        "column": "age",
+        "meaning": "Age of the patient",
+        "semantic_type": "numeric (integer)",
+        "values_units": "years"
+    },
+    {
+        "column": "sex",
+        "meaning": "Sex",
+        "semantic_type": "binary",
+        "values_units": "1 = male, 0 = female"
+    },
+    {
+        "column": "cp",
+        "meaning": "Chest pain type",
+        "semantic_type": "nominal",
+        "values_units": "1 = typical angina, 2 = atypical angina, 3 = non-anginal pain, 4 = asymptomatic"
+    },
+    {
+        "column": "trestbps",
+        "meaning": "Resting blood pressure on admission to the hospital",
+        "semantic_type": "numeric (integer)",
+        "values_units": "mm Hg"
+    },
+    {
+        "column": "chol",
+        "meaning": "Serum cholesterol",
+        "semantic_type": "numeric (integer)",
+        "values_units": "mg/dl"
+    },
+    {
+        "column": "fbs",
+        "meaning": "Fasting blood sugar > 120 mg/dl",
+        "semantic_type": "binary",
+        "values_units": "1 = true, 0 = false"
+    },
+    {
+        "column": "restecg",
+        "meaning": "Resting electrocardiogram result",
+        "semantic_type": "nominal",
+        "values_units": "0 = normal, 1 = ST-T wave abnormality, 2 = probable/definite left ventricular hypertrophy (Estes' criteria)"
+    },
+    {
+        "column": "thalach",
+        "meaning": "Maximum heart rate achieved during the exercise test",
+        "semantic_type": "numeric (integer)",
+        "values_units": "beats/min"
+    },
+    {
+        "column": "exang",
+        "meaning": "Exercise-induced angina",
+        "semantic_type": "binary",
+        "values_units": "1 = yes, 0 = no"
+    },
+    {
+        "column": "oldpeak",
+        "meaning": "ST depression induced by exercise relative to rest",
+        "semantic_type": "numeric (continuous)",
+        "values_units": "ECG depression, 0.0\u20136.2 (units not stated by UCI; conventionally mm)"
+    },
+    {
+        "column": "slope",
+        "meaning": "Slope of the peak exercise ST segment",
+        "semantic_type": "ordinal",
+        "values_units": "1 = upsloping, 2 = flat, 3 = downsloping"
+    },
+    {
+        "column": "ca",
+        "meaning": "Number of major vessels colored by fluoroscopy",
+        "semantic_type": "ordinal count",
+        "values_units": "0\u20133"
+    },
+    {
+        "column": "thal",
+        "meaning": "Thallium stress test result",
+        "semantic_type": "nominal",
+        "values_units": "3 = normal, 6 = fixed defect, 7 = reversible defect"
+    },
+    {
+        "column": "num",
+        "meaning": "Target: angiographic disease status",
+        "semantic_type": "ordinal",
+        "values_units": "0 = < 50% diameter narrowing (no disease); 1\u20134 = > 50% narrowing in at least one major vessel (disease present)"
+    }
+]
