@@ -82,5 +82,11 @@
         "meaning": "Target: angiographic disease status",
         "semantic_type": "ordinal",
         "values_units": "0 = < 50% diameter narrowing (no disease); 1\u20134 = > 50% narrowing in at least one major vessel (disease present)"
+    },
+    {
+        "column": "disease",
+        "meaning": "Derived binary target indicating the presence of heart disease",
+        "semantic_type": "binary (derived)",
+        "values_units": "0 = no disease (num = 0), 1 = disease present (num > 0)"
     }
 ]

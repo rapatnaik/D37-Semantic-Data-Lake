@@ -1,0 +1,93 @@
+
+[
+    {
+        "column": "patientid",
+        "meaning": "Unique patient identification number",
+        "semantic_type": "identifier (integer)",
+        "values_units": "Unique numeric ID; 1,000 distinct patients"
+    },
+    {
+        "column": "age",
+        "meaning": "Age of the patient",
+        "semantic_type": "numeric (integer)",
+        "values_units": "years (20–80)"
+    },
+    {
+        "column": "gender",
+        "meaning": "Gender of the patient",
+        "semantic_type": "binary",
+        "values_units": "0 = female, 1 = male"
+    },
+    {
+        "column": "chestpain",
+        "meaning": "Type of chest pain experienced",
+        "semantic_type": "nominal",
+        "values_units": "0 = typical angina, 1 = atypical angina, 2 = non-anginal pain, 3 = asymptomatic"
+    },
+    {
+        "column": "restingBP",
+        "meaning": "Resting blood pressure",
+        "semantic_type": "numeric (integer)",
+        "values_units": "mmHg (94–200)"
+    },
+    {
+        "column": "serumcholestrol",
+        "meaning": "Serum cholesterol level; zero readings replaced with missing values",
+        "semantic_type": "numeric (continuous, float)",
+        "values_units": "mg/dL (observed nonmissing range: 85–602); 53 NaN values"
+    },
+    {
+        "column": "fastingbloodsugar",
+        "meaning": "Fasting blood sugar > 120 mg/dL",
+        "semantic_type": "binary",
+        "values_units": "0 = false, 1 = true"
+    },
+    {
+        "column": "restingrelectro",
+        "meaning": "Resting electrocardiogram (ECG) result",
+        "semantic_type": "nominal",
+        "values_units": "0 = normal, 1 = ST-T wave abnormality, 2 = probable/definite left ventricular hypertrophy"
+    },
+    {
+        "column": "maxheartrate",
+        "meaning": "Maximum heart rate achieved",
+        "semantic_type": "numeric (integer)",
+        "values_units": "beats/min (71–202)"
+    },
+    {
+        "column": "exerciseangia",
+        "meaning": "Exercise-induced angina",
+        "semantic_type": "binary",
+        "values_units": "0 = no, 1 = yes"
+    },
+    {
+        "column": "oldpeak",
+        "meaning": "ST-segment depression induced by exercise relative to rest",
+        "semantic_type": "numeric (continuous)",
+        "values_units": "0.0–6.2 (measurement unit not specified)"
+    },
+    {
+        "column": "slope",
+        "meaning": "Slope of the peak exercise ST segment",
+        "semantic_type": "nominal",
+        "values_units": "0 = undocumented category (180 records), 1 = upsloping, 2 = flat, 3 = downsloping"
+    },
+    {
+        "column": "noofmajorvessels",
+        "meaning": "Number of major vessels",
+        "semantic_type": "discrete numeric (count)",
+        "values_units": "0–3 vessels"
+    },
+    {
+        "column": "target",
+        "meaning": "Target: presence or absence of heart disease",
+        "semantic_type": "binary",
+        "values_units": "0 = absence of heart disease, 1 = presence of heart disease"
+    },
+    {
+        "column": "cholesterol_missing",
+        "meaning": "Indicator identifying originally zero cholesterol measurements that were converted to NaN",
+        "semantic_type": "binary (derived)",
+        "values_units": "0 = original cholesterol measurement nonzero, 1 = original measurement zero (53 records)"
+    }
+]
