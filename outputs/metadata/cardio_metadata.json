@@ -454,7 +454,7 @@
             }
         }
     },
-    "candidate_keys": [
+    "potential_keys": [
         "patientid"
     ]
 }

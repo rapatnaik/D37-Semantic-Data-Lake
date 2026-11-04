@@ -53,8 +53,8 @@ def extract_metadata(path):
     for column in df.columns:
         metadata["columns"][column]["sql_profile"] = sql_stats[column]
 
-    #finding candidate primary keys
-    metadata["candidate_keys"] = primary_keys(df)
+    #finding potential primary keys
+    metadata["potential_keys"] = primary_keys(df)
 
     return metadata
 
