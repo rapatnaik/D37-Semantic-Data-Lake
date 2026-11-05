@@ -1,0 +1,184 @@
+{
+  "dataset": "../datasets/cleaned/heart_disease_cleaned.csv",
+  "model": "gpt-oss",
+  "columns": {
+    "patient_id": {
+      "description": "Unique numeric identifier for each patient record.",
+      "semantic_type": "identifier",
+      "unit": null,
+      "evidence": [
+        "distinct_count = 297 (matches row count)",
+        "column_sample values are sequential (0,1,2,3,4)",
+        "null_count = 0"
+      ],
+      "needs_verification": []
+    },
+    "age": {
+      "description": "Patient age in years.",
+      "semantic_type": "age",
+      "unit": "years",
+      "evidence": [
+        "min = 29, max = 77 \u2013 plausible human adult age range",
+        "mean = 54.5, median = 56 \u2013 typical for heart\u2011disease cohorts",
+        "null_count = 0"
+      ],
+      "needs_verification": []
+    },
+    "sex": {
+      "description": "Biological sex of the patient (1 = male, 0 = female).",
+      "semantic_type": "binary_categorical",
+      "unit": null,
+      "evidence": [
+        "distinct values = {0,1}",
+        "mean \u2248 0.68 \u2013 indicates more males than females",
+        "column name \"sex\""
+      ],
+      "needs_verification": []
+    },
+    "cp": {
+      "description": "Chest\u2011pain type (1 = typical angina, 2 = atypical angina, 3 = non\u2011anginal pain, 4 = asymptomatic).",
+      "semantic_type": "ordinal_categorical",
+      "unit": null,
+      "evidence": [
+        "distinct values = 1\u20114",
+        "column name \"cp\" (common abbreviation for chest pain)",
+        "mean = 3.16 \u2013 distribution centred around types 3\u20114"
+      ],
+      "needs_verification": []
+    },
+    "trestbps": {
+      "description": "Resting systolic blood pressure.",
+      "semantic_type": "vital_sign",
+      "unit": "mmHg",
+      "evidence": [
+        "min = 94, max = 200 \u2013 realistic systolic BP range",
+        "mean = 131.7, median = 130"
+      ],
+      "needs_verification": []
+    },
+    "chol": {
+      "description": "Serum cholesterol concentration.",
+      "semantic_type": "laboratory_result",
+      "unit": "mg/dL",
+      "evidence": [
+        "min = 126, max = 564 \u2013 plausible cholesterol values",
+        "mean = 247.35, median = 243"
+      ],
+      "needs_verification": []
+    },
+    "fbs": {
+      "description": "Fasting blood sugar > 120\u202fmg/dL (1 = true, 0 = false).",
+      "semantic_type": "binary_categorical",
+      "unit": null,
+      "evidence": [
+        "distinct values = {0,1}",
+        "column name \"fbs\" (standard abbreviation for fasting blood sugar)",
+        "mean = 0.145 \u2013 low prevalence of high fasting glucose"
+      ],
+      "needs_verification": []
+    },
+    "restecg": {
+      "description": "Resting electrocardiographic results (0 = normal, 1 = ST\u2011T wave abnormality, 2 = left ventricular hypertrophy).",
+      "semantic_type": "ordinal_categorical",
+      "unit": null,
+      "evidence": [
+        "distinct values = 0\u20112",
+        "column name \"restecg\"",
+        "mean \u2248 1.0"
+      ],
+      "needs_verification": []
+    },
+    "thalach": {
+      "description": "Maximum heart rate achieved during exercise.",
+      "semantic_type": "vital_sign",
+      "unit": "beats per minute",
+      "evidence": [
+        "min = 71, max = 202 \u2013 realistic heart\u2011rate range",
+        "mean = 149.6, median = 153"
+      ],
+      "needs_verification": []
+    },
+    "exang": {
+      "description": "Exercise\u2011induced angina (1 = yes, 0 = no).",
+      "semantic_type": "binary_categorical",
+      "unit": null,
+      "evidence": [
+        "distinct values = {0,1}",
+        "column name \"exang\" (common abbreviation for exercise angina)",
+        "mean = 0.327"
+      ],
+      "needs_verification": []
+    },
+    "oldpeak": {
+      "description": "ST depression induced by exercise relative to rest.",
+      "semantic_type": "continuous_numeric",
+      "unit": null,
+      "evidence": [
+        "min = 0.0, max = 6.2 \u2013 typical range for ST\u2011segment depression",
+        "mean = 1.06, median = 0.8"
+      ],
+      "needs_verification": []
+    },
+    "slope": {
+      "description": "Slope of the peak exercise ST segment (1 = upsloping, 2 = flat, 3 = downsloping).",
+      "semantic_type": "ordinal_categorical",
+      "unit": null,
+      "evidence": [
+        "distinct values = 1\u20113",
+        "column name \"slope\"",
+        "mean = 1.60 \u2013 distribution weighted toward lower values"
+      ],
+      "needs_verification": []
+    },
+    "ca": {
+      "description": "Number of major vessels (0\u20113) colored by fluoroscopy.",
+      "semantic_type": "ordinal_categorical",
+      "unit": null,
+      "evidence": [
+        "distinct values = 0\u20113",
+        "column name \"ca\" (common abbreviation for vessels count)",
+        "mean = 0.68, median = 0"
+      ],
+      "needs_verification": [
+        "Confirm that values represent number of vessels rather than another count"
+      ]
+    },
+    "thal": {
+      "description": "Thalassemia result (3 = normal, 6 = fixed defect, 7 = reversible defect).",
+      "semantic_type": "categorical",
+      "unit": null,
+      "evidence": [
+        "distinct values = {3,6,7}",
+        "column name \"thal\" (standard abbreviation for thalassemia)",
+        "mean = 4.73"
+      ],
+      "needs_verification": [
+        "Verify mapping of numeric codes to clinical meanings"
+      ]
+    },
+    "num": {
+      "description": "Number of vessels with > 50\u202f% diameter narrowing (0\u20113) or disease score (0 = no disease, 1\u20114 = increasing severity).",
+      "semantic_type": "ordinal_categorical",
+      "unit": null,
+      "evidence": [
+        "distinct values = 0\u20114",
+        "column name \"num\" (often used for disease count)",
+        "mean = 0.95, median = 0"
+      ],
+      "needs_verification": [
+        "Clarify whether 4 represents four diseased vessels or a composite severity score"
+      ]
+    },
+    "disease": {
+      "description": "Binary indicator of presence of heart disease (1 = disease, 0 = no disease).",
+      "semantic_type": "binary_target",
+      "unit": null,
+      "evidence": [
+        "distinct values = {0,1}",
+        "column name \"disease\"",
+        "mean = 0.461 \u2013 roughly 46\u202f% positive cases"
+      ],
+      "needs_verification": []
+    }
+  }
+}
