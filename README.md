@@ -21,3 +21,26 @@ Outputs from the first test run are in [outputs/semantic_agent_profiles/](output
 [`test_001_cardio.json`](outputs/semantic_agent_profiles/test_001_cardio.json) and
 [`test_001_heart.json`](outputs/semantic_agent_profiles/test_001_heart.json).
 Each new run saves one file per dataset under the next test number.
+
+## Running the agent integration pipeline
+
+`run_pipeline.py` runs the metadata agent and the semantic agent on every dataset, then compares their output with the Assignment 1 data dictionaries and EDA findings. The pipeline code lives in `agents/agent_integration.py`.
+
+To reuse the latest saved semantic run, which needs no API key:
+
+```sh
+uv run --locked python run_pipeline.py --offline
+```
+
+To call the LLM for a new semantic run:
+
+```sh
+uv run --locked --env-file .env python run_pipeline.py
+```
+
+Outputs from the first test run are in [outputs/agent_integration/](outputs/agent_integration/):
+[`test_001_evaluation_results.json`](outputs/agent_integration/test_001_evaluation_results.json).
+It starts with a summary for each dataset, followed by the per-column results.
+Each new run saves its results under the next test number. The metadata agent's profiles are written to `outputs/agent_integration/metadata/`, and the semantic agent reads them from there.
+
+[`evaluation/agent_comparison.md`](evaluation/agent_comparison.md) compares the agents' output with the human-written Assignment 1 profiles. It covers accuracy, errors, missing information and limitations. [`notebooks/agent_integration_tests.ipynb`](notebooks/agent_integration_tests.ipynb) runs each pipeline step and checks the results.

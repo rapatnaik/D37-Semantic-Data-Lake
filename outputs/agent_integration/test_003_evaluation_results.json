@@ -1,0 +1,397 @@
+{
+  "finished_at": "2026-11-05T22:33:50+00:00",
+  "semantic_run": 1,
+  "datasets": {
+    "heart": {
+      "summary": {
+        "metadata_checks_passed": "196/196",
+        "raw_issues": {
+          "detected": 2,
+          "missed": 2
+        },
+        "semantic_meaning": {
+          "correct": 14,
+          "partially_correct": 2
+        },
+        "semantic_units": {
+          "match": 5
+        },
+        "semantic_codes": {
+          "match": 8,
+          "partial": 1
+        },
+        "errors_flagged_by_agent": "2/2"
+      },
+      "metadata": {
+        "checks": 196,
+        "passed": 196,
+        "failed": [],
+        "primary_key_found": true
+      },
+      "raw_issues": [
+        {
+          "issue": "4 missing values in ca",
+          "outcome": "detected"
+        },
+        {
+          "issue": "2 missing values in thal",
+          "outcome": "detected"
+        },
+        {
+          "issue": "restecg = 1 has only 4 patients",
+          "outcome": "missed"
+        },
+        {
+          "issue": "thal = 6 has only 18 patients",
+          "outcome": "missed"
+        }
+      ],
+      "semantic": [
+        {
+          "column": "patient_id",
+          "meaning": "correct",
+          "unit": null,
+          "codes": null,
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "age",
+          "meaning": "correct",
+          "unit": "match",
+          "codes": null,
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "sex",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "cp",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "trestbps",
+          "meaning": "correct",
+          "unit": "match",
+          "codes": null,
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "chol",
+          "meaning": "correct",
+          "unit": "match",
+          "codes": null,
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "fbs",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "restecg",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "thalach",
+          "meaning": "correct",
+          "unit": "match",
+          "codes": null,
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "exang",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "oldpeak",
+          "meaning": "correct",
+          "unit": "match",
+          "codes": null,
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "slope",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "ca",
+          "meaning": "correct",
+          "unit": null,
+          "codes": null,
+          "flagged": true,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "thal",
+          "meaning": "partially_correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": true,
+          "error": true,
+          "note": "calls it thalassemia; human profile says thallium stress test (codes right)"
+        },
+        {
+          "column": "num",
+          "meaning": "partially_correct",
+          "unit": null,
+          "codes": "partial",
+          "flagged": true,
+          "error": true,
+          "note": "first reading (vessel count 0-3) is wrong; second (0 = no disease, 1-4 = disease) is right"
+        },
+        {
+          "column": "disease",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": false,
+          "error": false,
+          "note": ""
+        }
+      ]
+    },
+    "cardio": {
+      "summary": {
+        "metadata_checks_passed": "184/184",
+        "raw_issues": {
+          "visible": 2,
+          "missed": 1
+        },
+        "semantic_meaning": {
+          "correct": 13,
+          "partially_correct": 2
+        },
+        "semantic_units": {
+          "match": 4,
+          "hedged_guess": 1
+        },
+        "semantic_codes": {
+          "match": 7,
+          "mismatch": 1
+        },
+        "errors_flagged_by_agent": "1/2"
+      },
+      "metadata": {
+        "checks": 184,
+        "passed": 184,
+        "failed": [],
+        "primary_key_found": true
+      },
+      "raw_issues": [
+        {
+          "issue": "53 cholesterol readings of 0 are really missing",
+          "outcome": "visible"
+        },
+        {
+          "issue": "slope = 0 (180 rows) is undocumented",
+          "outcome": "visible"
+        },
+        {
+          "issue": "all missing cholesterol is in target = 1 patients",
+          "outcome": "missed"
+        }
+      ],
+      "semantic": [
+        {
+          "column": "patientid",
+          "meaning": "correct",
+          "unit": null,
+          "codes": null,
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "age",
+          "meaning": "correct",
+          "unit": "match",
+          "codes": null,
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "gender",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": true,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "chestpain",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": true,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "restingBP",
+          "meaning": "correct",
+          "unit": "match",
+          "codes": null,
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "serumcholestrol",
+          "meaning": "correct",
+          "unit": "match",
+          "codes": null,
+          "flagged": true,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "fastingbloodsugar",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": true,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "restingrelectro",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": true,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "maxheartrate",
+          "meaning": "correct",
+          "unit": "match",
+          "codes": null,
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "exerciseangia",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "oldpeak",
+          "meaning": "correct",
+          "unit": "hedged_guess",
+          "codes": null,
+          "flagged": true,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "slope",
+          "meaning": "partially_correct",
+          "unit": null,
+          "codes": "mismatch",
+          "flagged": true,
+          "error": true,
+          "note": "labels in wrong codes: implies 0 = upsloping; human has 0 = undocumented, 1-3 = up/flat/down"
+        },
+        {
+          "column": "noofmajorvessels",
+          "meaning": "partially_correct",
+          "unit": null,
+          "codes": null,
+          "flagged": false,
+          "error": true,
+          "note": "adds 'with significant narrowing', which is unsupported and not flagged"
+        },
+        {
+          "column": "target",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": false,
+          "error": false,
+          "note": ""
+        },
+        {
+          "column": "cholesterol_missing",
+          "meaning": "correct",
+          "unit": null,
+          "codes": "match",
+          "flagged": false,
+          "error": false,
+          "note": ""
+        }
+      ]
+    }
+  },
+  "relationships": [
+    {
+      "pair": "heart vs cardio",
+      "expected": 14,
+      "found": 3,
+      "correct": 3,
+      "missed": [
+        "ca/noofmajorvessels",
+        "chol/serumcholestrol",
+        "cp/chestpain",
+        "disease/target",
+        "exang/exerciseangia",
+        "fbs/fastingbloodsugar",
+        "patient_id/patientid",
+        "restecg/restingrelectro",
+        "sex/gender",
+        "thalach/maxheartrate",
+        "trestbps/restingBP"
+      ]
+    }
+  ]
+}
