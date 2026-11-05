@@ -1,0 +1,200 @@
+{
+  "dataset": "../datasets/cleaned/cardiovascular_cleaned.csv",
+  "model": "gpt-oss",
+  "columns": {
+    "patientid": {
+      "description": "Unique identifier for each patient record.",
+      "semantic_type": "identifier",
+      "unit": null,
+      "evidence": [
+        "datatype: int64",
+        "distinct_count: 1000 (matches row count)",
+        "column_sample: [103368,119250,119372,132514,146211]",
+        "no null values"
+      ],
+      "needs_verification": []
+    },
+    "age": {
+      "description": "Patient age in years at the time of examination.",
+      "semantic_type": "demographic",
+      "unit": "years",
+      "evidence": [
+        "datatype: int64",
+        "min: 20, max: 80, mean: 49.242, median: 49",
+        "column_sample: [53,40,49,43,31]",
+        "no null values"
+      ],
+      "needs_verification": []
+    },
+    "gender": {
+      "description": "Sex of the patient; 0 and 1 represent two categories (commonly 0\u202f=\u202ffemale, 1\u202f=\u202fmale).",
+      "semantic_type": "demographic",
+      "unit": null,
+      "evidence": [
+        "datatype: int64",
+        "distinct_count: 2, min: 0, max: 1, mean: 0.765",
+        "column_sample: [1,1,1,1,1]",
+        "no null values"
+      ],
+      "needs_verification": [
+        "Exact mapping of 0/1 to female/male is assumed from common heart\u2011disease datasets; confirm with source documentation."
+      ]
+    },
+    "chestpain": {
+      "description": "Type of chest pain experienced, encoded as an integer from 0\u20113 (e.g., typical angina, atypical angina, non\u2011anginal pain, asymptomatic).",
+      "semantic_type": "clinical_feature",
+      "unit": null,
+      "evidence": [
+        "datatype: int64",
+        "distinct_count: 4, min: 0, max: 3, mean: 0.98",
+        "column_sample: [2,0,2,0,1]",
+        "no null values"
+      ],
+      "needs_verification": [
+        "Specific meaning of each integer code should be verified against the original dataset codebook."
+      ]
+    },
+    "restingBP": {
+      "description": "Resting systolic blood pressure measured at admission.",
+      "semantic_type": "vital_sign",
+      "unit": "mm Hg",
+      "evidence": [
+        "datatype: int64",
+        "min: 94, max: 200, mean: 151.747, median: 147",
+        "column_sample: [171,94,133,138,199]",
+        "no null values"
+      ],
+      "needs_verification": []
+    },
+    "serumcholestrol": {
+      "description": "Serum cholesterol concentration.",
+      "semantic_type": "laboratory_result",
+      "unit": "mg/dL (hypothesized)",
+      "evidence": [
+        "datatype: float64",
+        "null_count: 53 (5.3% missing)",
+        "min: 85, max: 602, mean: 328.8775, median: 326",
+        "column_sample: [229.0,142.0,295.0,240.0,345.0]"
+      ],
+      "needs_verification": [
+        "Unit assumed to be mg/dL, as typical for serum cholesterol; confirm with data source."
+      ]
+    },
+    "fastingbloodsugar": {
+      "description": "Indicator of fasting blood sugar > 120\u202fmg/dL (1\u202f=\u202ftrue, 0\u202f=\u202ffalse).",
+      "semantic_type": "laboratory_indicator",
+      "unit": null,
+      "evidence": [
+        "datatype: int64",
+        "distinct_count: 2, min: 0, max: 1, mean: 0.296",
+        "column_sample: [0,0,0,1,0]",
+        "no null values"
+      ],
+      "needs_verification": [
+        "Threshold (120\u202fmg/dL) is inferred from the classic UCI heart\u2011disease dataset; verify against the dataset documentation."
+      ]
+    },
+    "restingrelectro": {
+      "description": "Resting electrocardiographic results coded as 0\u20112 (normal, ST\u2011T wave abnormality, left ventricular hypertrophy).",
+      "semantic_type": "clinical_test",
+      "unit": null,
+      "evidence": [
+        "datatype: int64",
+        "distinct_count: 3, min: 0, max: 2, mean: 0.748",
+        "column_sample: [1,1,0,1,2]",
+        "no null values"
+      ],
+      "needs_verification": [
+        "Exact mapping of codes to ECG findings should be cross\u2011checked with the original codebook."
+      ]
+    },
+    "maxheartrate": {
+      "description": "Maximum heart rate achieved during exercise stress test.",
+      "semantic_type": "vital_sign",
+      "unit": "beats per minute",
+      "evidence": [
+        "datatype: int64",
+        "min: 71, max: 202, mean: 145.477, median: 146",
+        "column_sample: [147,115,202,153,136]",
+        "no null values"
+      ],
+      "needs_verification": []
+    },
+    "exerciseangia": {
+      "description": "Exercise\u2011induced angina (1\u202f=\u202fyes, 0\u202f=\u202fno).",
+      "semantic_type": "clinical_feature",
+      "unit": null,
+      "evidence": [
+        "datatype: int64",
+        "distinct_count: 2, min: 0, max: 1, mean: 0.498",
+        "column_sample: [0,0,1,0,0]",
+        "no null values"
+      ],
+      "needs_verification": []
+    },
+    "oldpeak": {
+      "description": "ST\u2011segment depression induced by exercise relative to rest (the \u2018oldpeak\u2019 value).",
+      "semantic_type": "clinical_measurement",
+      "unit": "mm (hypothesized)",
+      "evidence": [
+        "datatype: float64",
+        "min: 0.0, max: 6.2, mean: 2.7077, median: 2.4",
+        "column_sample: [5.3,3.7,5.0,3.2,5.3]",
+        "no null values"
+      ],
+      "needs_verification": [
+        "Unit is commonly recorded in millimetres of ST depression; confirm with source."
+      ]
+    },
+    "slope": {
+      "description": "Slope of the peak exercise ST segment, coded as 0\u20113 (upsloping, flat, downsloping, unknown).",
+      "semantic_type": "clinical_feature",
+      "unit": null,
+      "evidence": [
+        "datatype: int64",
+        "distinct_count: 4, min: 0, max: 3, mean: 1.54, median: 2",
+        "column_sample: [3,1,1,2,3]",
+        "no null values"
+      ],
+      "needs_verification": [
+        "Exact textual meaning of each integer value should be validated."
+      ]
+    },
+    "noofmajorvessels": {
+      "description": "Number of major coronary vessels (0\u20113) with significant narrowing as seen on fluoroscopy.",
+      "semantic_type": "clinical_measurement",
+      "unit": null,
+      "evidence": [
+        "datatype: int64",
+        "distinct_count: 4, min: 0, max: 3, mean: 1.222, median: 1",
+        "column_sample: [3,1,0,2,2]",
+        "no null values"
+      ],
+      "needs_verification": []
+    },
+    "target": {
+      "description": "Presence of heart disease (1\u202f=\u202fdisease, 0\u202f=\u202fno disease).",
+      "semantic_type": "label",
+      "unit": null,
+      "evidence": [
+        "datatype: int64",
+        "distinct_count: 2, min: 0, max: 1, mean: 0.58, median: 1",
+        "column_sample: [1,0,0,1,1]",
+        "no null values"
+      ],
+      "needs_verification": []
+    },
+    "cholesterol_missing": {
+      "description": "Binary flag indicating whether serum cholesterol value is missing (1\u202f=\u202fmissing, 0\u202f=\u202fpresent).",
+      "semantic_type": "metadata_flag",
+      "unit": null,
+      "evidence": [
+        "datatype: int64",
+        "distinct_count: 2, min: 0, max: 1, mean: 0.053, median: 0",
+        "column_sample: [1,0,0,0,1]",
+        "no null values"
+      ],
+      "needs_verification": []
+    }
+  }
+}
