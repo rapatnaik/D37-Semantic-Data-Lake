@@ -44,3 +44,9 @@ It starts with a summary for each dataset, followed by the per-column results.
 Each new run saves its results under the next test number. The metadata agent's profiles are written to `outputs/agent_integration/metadata/`, and the semantic agent reads them from there.
 
 [`evaluation/agent_comparison.md`](evaluation/agent_comparison.md) compares the agents' output with the human-written Assignment 1 profiles. It covers accuracy, errors, missing information and limitations. [`notebooks/agent_integration_tests.ipynb`](notebooks/agent_integration_tests.ipynb) runs each pipeline step and checks the results.
+
+## AI and Human Contribution Statements
+
+*AI Contribution*: Our team used AI tools such as ChatGPT to help with every portion of the codebase, including data cleaning decisions and for the design of our EDA, agents, and evaluation pipeline. After coding, we used AI to fix bugs and check for discrepancies across functions. 
+
+*Human Contribution*: Team members were still responsible for confirming the scope of responsibilities, choosing and cleaning our datasets, defining the project architecture and scope, building the metadata and semantic agents, evaluating the outputs, and interpreting all results. Throughout any AI usage, we made sure to thoroughly examine any AI-generated code and made sure to manually tweak and change any mistakes before adding it to our codebase.
