@@ -1,0 +1,2 @@
+sample_id,orientation_candidate,threshold_method,roi_mode,roi_sample_sd,threshold,analyzed_roi_pixels,wga_threshold_area_pct,manual_mask_coverage_pct,manual_added_area_percentage_points,provisional_combined_area_pct,native_alignment_verified,measurement_status
+190930_1_overview,A_documented_starting_workflow,ROI mode + sample standard deviation,29.0,14.445719832851378,43.44571983285138,7326124,11.294799269026841,55.09640568464307,48.927673077878566,60.2224723469054,False,provisional_alignment_unresolved

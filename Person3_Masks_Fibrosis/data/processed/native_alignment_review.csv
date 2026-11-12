@@ -1,0 +1,2 @@
+sample_id,series_index,python_channel_index,channel_assignment_source,roi_height_px,roi_width_px,mask_dimensions_match,manual_mask_coverage_pct,alignment_status,native_alignment_verified,review_notes
+190930_1_overview,0,2,fibrosisAnalysis.m,1583,4628,True,55.09640568464307,needs_reference_validation,False,Dimensions match. Shaded overlay includes portions of dark gaps and crosses visible tissue structures. Original MATLAB loader orientation and reference crop have not been confirmed. No corrective mask transformations applied.
