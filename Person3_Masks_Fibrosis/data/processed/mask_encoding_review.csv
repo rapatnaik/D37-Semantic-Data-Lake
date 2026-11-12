@@ -1,0 +1,14 @@
+sample_id,mask_filename,stored_values,encoding_status,pixels_equal_1,pixels_equal_255,foreground_meaning_confirmed
+190930_1_overview,190930_1_Mask.tif,"[0, 1]",compatible_with_script_value_1,4036431,0,False
+191007_1_overview,191007_1_Mask.tif,"[0, 255]",value_255_requires_review,0,612503,False
+191017_1_overview,191017_1_Mask.tif,"[0, 1]",compatible_with_script_value_1,480664,0,False
+191017_5_overview,191017_5_Mask.tif,"[0, 1]",compatible_with_script_value_1,763990,0,False
+191101_1_overview,191101_1_Mask.tif,"[0, 1]",compatible_with_script_value_1,351610,0,False
+191108_1_overview,191108_1_Mask.tif,"[0, 1]",compatible_with_script_value_1,2584847,0,False
+191210_4_overview,191210_4_Mask.tif,"[0, 1]",compatible_with_script_value_1,803173,0,False
+191211_3_overview,191211_3_Mask.tif,"[0, 1]",compatible_with_script_value_1,4801745,0,False
+200102_1_overview,200102_1_Mask.tif,"[0, 1]",compatible_with_script_value_1,804474,0,False
+200106_2_overview,200106_2_Mask.tif,"[0, 1]",compatible_with_script_value_1,1642590,0,False
+200214_1_overview,200214_1_Mask.tif,"[0, 1]",compatible_with_script_value_1,843102,0,False
+200219_1_overview,200219_1_Mask.tif,"[0, 255]",value_255_requires_review,0,2781601,False
+200318_2_overview,200318_2_Mask.tif,"[0, 1]",compatible_with_script_value_1,498379,0,False

@@ -1,0 +1,14 @@
+sample_id,mask_filename,height_px,width_px,stored_values,total_pixels,nonzero_pixels,stored_nonzero_coverage_pct,script_value_1_coverage_pct,connected_component_count,mean_component_area_px,median_component_area_px,largest_component_area_px,connectivity,encoding_review_required,biological_foreground_verified,native_alignment_verified,included_in_study,study_group,dimension_check
+190930_1_overview,190930_1_Mask.tif,1583,4628,"[0, 1]",7326124,4036431,55.09640568464307,55.09640568464307,4,1009107.75,222567.0,3547458,8,False,False,False,True,HF,matches_expected_roi_crop
+191007_1_overview,191007_1_Mask.tif,2640,2640,"[0, 255]",6969600,612503,8.788208792470156,0.0,8,76562.875,73355.0,148296,8,True,False,False,True,HF,matches_expected_roi_crop
+191017_1_overview,191017_1_Mask.tif,2648,2644,"[0, 1]",7001312,480664,6.865341810220713,6.865341810220713,2,240332.0,240332.0,304691,8,False,False,False,True,HF,matches_expected_roi_crop
+191017_5_overview,191017_5_Mask.tif,2641,2640,"[0, 1]",6972240,763990,10.957597558316984,10.957597558316984,3,254663.33333333334,129898.0,570904,8,False,False,False,True,HF,matches_expected_roi_crop
+191101_1_overview,191101_1_Mask.tif,4882,1321,"[0, 1]",6449122,351610,5.452059985839933,5.452059985839933,3,117203.33333333333,144303.0,187639,8,False,False,False,True,HF,matches_expected_roi_crop
+191108_1_overview,191108_1_Mask.tif,2648,2653,"[0, 1]",7025144,2584847,36.79422087291022,36.79422087291022,4,646211.75,457342.0,1623210,8,False,False,False,True,HF,matches_expected_roi_crop
+191210_4_overview,191210_4_Mask.tif,2640,2640,"[0, 1]",6969600,803173,11.523946854912763,11.523946854912763,3,267724.3333333333,230673.0,499076,8,False,False,False,True,HF,matches_expected_roi_crop
+191211_3_overview,191211_3_Mask.tif,2640,2640,"[0, 1]",6969600,4801745,68.89556072084481,68.89556072084481,4,1200436.25,12.5,4801719,8,False,False,False,True,HF,matches_expected_roi_crop
+200102_1_overview,200102_1_Mask.tif,1856,4240,"[0, 1]",7869440,804474,10.222760450553025,10.222760450553025,6,134079.0,132560.5,228355,8,False,False,False,True,HF,matches_expected_roi_crop
+200106_2_overview,200106_2_Mask.tif,2640,2640,"[0, 1]",6969600,1642590,23.56792355371901,23.56792355371901,13,126353.07692307692,71806.0,473101,8,False,False,False,True,HF,matches_expected_roi_crop
+200214_1_overview,200214_1_Mask.tif,2112,3168,"[0, 1]",6690816,843102,12.600884555785123,12.600884555785123,2,421551.0,421551.0,798510,8,False,False,False,True,HF,matches_expected_roi_crop
+200219_1_overview,200219_1_Mask.tif,2640,2640,"[0, 255]",6969600,2781601,39.910482667584944,0.0,4,695400.25,260206.0,2151035,8,True,False,False,True,HF,matches_expected_roi_crop
+200318_2_overview,200318_2_Mask.tif,876,4260,"[0, 1]",3731760,498379,13.355065706261925,13.355065706261925,6,83063.16666666667,56315.5,254559,8,False,False,False,True,HF,matches_expected_roi_crop
