@@ -224,7 +224,7 @@ def extract_metadata_img(path):
             coordinates = np.loadtxt(roi_path, dtype=float)
             if coordinates.shape != (4,2):
                 raise ValueError(
-                    f"The ROI shape should be 5x2. This one is: "
+                    f"The ROI shape should be 4x2. This one is: "
                     f"{coordinates.shape}"
                 )
             
@@ -262,7 +262,7 @@ def extract_metadata_img(path):
     if orientation_path.exists():
         orientation_df = pd.read_csv(
             orientation_path,
-            sep=r"\s+"
+            sep=r"\s+",
             engine="python"
         )
 

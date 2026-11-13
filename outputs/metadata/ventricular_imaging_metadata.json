@@ -1,0 +1,1718 @@
+{
+    "dataset": "ventricular_tissue_imaging",
+    "source_path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data",
+    "modality": "microscopy_imaging",
+    "sample_count": 22,
+    "roi_count": 22,
+    "orientation_count": 22,
+    "mask_count": 13,
+    "native_image_count": 0,
+    "samples": {
+        "190913_1_overview": {
+            "sample_id": "190913_1_overview",
+            "files": {
+                "roi": {
+                    "filename": "190913_1_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/190913_1_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        2979.0,
+                        1524.0
+                    ],
+                    [
+                        3643.0,
+                        1524.0
+                    ],
+                    [
+                        3643.0,
+                        2188.0
+                    ],
+                    [
+                        2979.0,
+                        2188.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 2979.0,
+                "x_max": 3643.0,
+                "y_min": 1524.0,
+                "y_max": 2188.0,
+                "width_px": 664.0,
+                "height_px": 664.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 0.0
+            },
+            "included_in_study": false,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": false,
+                "has_native_image": false
+            }
+        },
+        "190930_1_overview": {
+            "sample_id": "190930_1_overview",
+            "files": {
+                "roi": {
+                    "filename": "190930_1_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/190930_1_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                },
+                "mask": {
+                    "filename": "190930_1_Mask.tif",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/Masks/190930_1_Mask.tif",
+                    "extension": ".tif",
+                    "filesize": 7326352
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        1164.0,
+                        5084.0
+                    ],
+                    [
+                        5792.0,
+                        5084.0
+                    ],
+                    [
+                        5792.0,
+                        6667.0
+                    ],
+                    [
+                        1164.0,
+                        6667.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 1164.0,
+                "x_max": 5792.0,
+                "y_min": 5084.0,
+                "y_max": 6667.0,
+                "width_px": 4628.0,
+                "height_px": 1583.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 0.0
+            },
+            "mask": {
+                "shape": [
+                    1583,
+                    4628
+                ],
+                "dtype": "uint8",
+                "unique_values": [
+                    0.0,
+                    1.0
+                ],
+                "unique_value_counts": {
+                    "0": 3289693,
+                    "1": 4036431
+                },
+                "total_pixels": 7326124,
+                "nonzero_pixels": 4036431,
+                "nonzero_percentage": 55.1,
+                "is_binary": true,
+                "native_alignment_verified": false,
+                "roi_dimension_match": true
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": true,
+                "has_native_image": false
+            }
+        },
+        "191007_1_overview": {
+            "sample_id": "191007_1_overview",
+            "files": {
+                "roi": {
+                    "filename": "191007_1_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/191007_1_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                },
+                "mask": {
+                    "filename": "191007_1_Mask.tif",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/Masks/191007_1_Mask.tif",
+                    "extension": ".tif",
+                    "filesize": 6971360
+                }
+            },
+            "quality_flags": [
+                "mask_uses_0_255_encoding"
+            ],
+            "roi": {
+                "coordinates": [
+                    [
+                        1000.0,
+                        4376.0
+                    ],
+                    [
+                        3640.0,
+                        4376.0
+                    ],
+                    [
+                        3640.0,
+                        7016.0
+                    ],
+                    [
+                        1000.0,
+                        7016.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 1000.0,
+                "x_max": 3640.0,
+                "y_min": 4376.0,
+                "y_max": 7016.0,
+                "width_px": 2640.0,
+                "height_px": 2640.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 118.0
+            },
+            "mask": {
+                "shape": [
+                    2640,
+                    2640
+                ],
+                "dtype": "uint8",
+                "unique_values": [
+                    0.0,
+                    255.0
+                ],
+                "unique_value_counts": {
+                    "0": 6357097,
+                    "255": 612503
+                },
+                "total_pixels": 6969600,
+                "nonzero_pixels": 612503,
+                "nonzero_percentage": 8.79,
+                "is_binary": true,
+                "native_alignment_verified": false,
+                "roi_dimension_match": true
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": true,
+                "has_native_image": false
+            }
+        },
+        "191007_2_overview": {
+            "sample_id": "191007_2_overview",
+            "files": {
+                "roi": {
+                    "filename": "191007_2_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/191007_2_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        5098.0,
+                        2224.0
+                    ],
+                    [
+                        8532.0,
+                        2224.0
+                    ],
+                    [
+                        8532.0,
+                        4204.0
+                    ],
+                    [
+                        5098.0,
+                        4204.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 5098.0,
+                "x_max": 8532.0,
+                "y_min": 2224.0,
+                "y_max": 4204.0,
+                "width_px": 3434.0,
+                "height_px": 1980.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 40.0
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": false,
+                "has_native_image": false
+            }
+        },
+        "191017_1_overview": {
+            "sample_id": "191017_1_overview",
+            "files": {
+                "roi": {
+                    "filename": "191017_1_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/191017_1_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 42
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                },
+                "mask": {
+                    "filename": "191017_1_Mask.tif",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/Masks/191017_1_Mask.tif",
+                    "extension": ".tif",
+                    "filesize": 7001476
+                }
+            },
+            "quality_flags": [
+                "roi_preliminary_validation_failed"
+            ],
+            "roi": {
+                "coordinates": [
+                    [
+                        7568.0,
+                        3048.0
+                    ],
+                    [
+                        10212.0,
+                        3048.0
+                    ],
+                    [
+                        10212.0,
+                        5696.0
+                    ],
+                    [
+                        7568.0,
+                        5696.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 7568.0,
+                "x_max": 10212.0,
+                "y_min": 3048.0,
+                "y_max": 5696.0,
+                "width_px": 2644.0,
+                "height_px": 2648.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 125.0
+            },
+            "mask": {
+                "shape": [
+                    2648,
+                    2644
+                ],
+                "dtype": "uint8",
+                "unique_values": [
+                    0.0,
+                    1.0
+                ],
+                "unique_value_counts": {
+                    "0": 6520648,
+                    "1": 480664
+                },
+                "total_pixels": 7001312,
+                "nonzero_pixels": 480664,
+                "nonzero_percentage": 6.87,
+                "is_binary": true,
+                "native_alignment_verified": false,
+                "roi_dimension_match": true
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": false,
+                "issue": "outside_transformed_bounds",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": true,
+                "has_native_image": false
+            }
+        },
+        "191017_5_overview": {
+            "sample_id": "191017_5_overview",
+            "files": {
+                "roi": {
+                    "filename": "191017_5_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/191017_5_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 38
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                },
+                "mask": {
+                    "filename": "191017_5_Mask.tif",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/Masks/191017_5_Mask.tif",
+                    "extension": ".tif",
+                    "filesize": 6972404
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        1698.0,
+                        696.0
+                    ],
+                    [
+                        4338.0,
+                        696.0
+                    ],
+                    [
+                        4338.0,
+                        3337.0
+                    ],
+                    [
+                        1698.0,
+                        3337.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 1698.0,
+                "x_max": 4338.0,
+                "y_min": 696.0,
+                "y_max": 3337.0,
+                "width_px": 2640.0,
+                "height_px": 2641.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 121.0
+            },
+            "mask": {
+                "shape": [
+                    2641,
+                    2640
+                ],
+                "dtype": "uint8",
+                "unique_values": [
+                    0.0,
+                    1.0
+                ],
+                "unique_value_counts": {
+                    "0": 6208250,
+                    "1": 763990
+                },
+                "total_pixels": 6972240,
+                "nonzero_pixels": 763990,
+                "nonzero_percentage": 10.96,
+                "is_binary": true,
+                "native_alignment_verified": false,
+                "roi_dimension_match": true
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": true,
+                "has_native_image": false
+            }
+        },
+        "191101_1_overview": {
+            "sample_id": "191101_1_overview",
+            "files": {
+                "roi": {
+                    "filename": "191101_1_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/191101_1_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                },
+                "mask": {
+                    "filename": "191101_1_Mask.tif",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/Masks/191101_1_Mask.tif",
+                    "extension": ".tif",
+                    "filesize": 6449350
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        3636.0,
+                        1682.0
+                    ],
+                    [
+                        4957.0,
+                        1682.0
+                    ],
+                    [
+                        4957.0,
+                        6564.0
+                    ],
+                    [
+                        3636.0,
+                        6564.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 3636.0,
+                "x_max": 4957.0,
+                "y_min": 1682.0,
+                "y_max": 6564.0,
+                "width_px": 1321.0,
+                "height_px": 4882.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 20.0
+            },
+            "mask": {
+                "shape": [
+                    4882,
+                    1321
+                ],
+                "dtype": "uint8",
+                "unique_values": [
+                    0.0,
+                    1.0
+                ],
+                "unique_value_counts": {
+                    "0": 6097512,
+                    "1": 351610
+                },
+                "total_pixels": 6449122,
+                "nonzero_pixels": 351610,
+                "nonzero_percentage": 5.45,
+                "is_binary": true,
+                "native_alignment_verified": false,
+                "roi_dimension_match": true
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": true,
+                "has_native_image": false
+            }
+        },
+        "191107_2_overview": {
+            "sample_id": "191107_2_overview",
+            "files": {
+                "roi": {
+                    "filename": "191107_2_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/191107_2_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        6933.0,
+                        4640.0
+                    ],
+                    [
+                        9264.0,
+                        4640.0
+                    ],
+                    [
+                        9264.0,
+                        6576.0
+                    ],
+                    [
+                        6933.0,
+                        6576.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 6933.0,
+                "x_max": 9264.0,
+                "y_min": 4640.0,
+                "y_max": 6576.0,
+                "width_px": 2331.0,
+                "height_px": 1936.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 10.0
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": false,
+                "has_native_image": false
+            }
+        },
+        "191108_1_overview": {
+            "sample_id": "191108_1_overview",
+            "files": {
+                "roi": {
+                    "filename": "191108_1_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/191108_1_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 42
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                },
+                "mask": {
+                    "filename": "191108_1_Mask.tif",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/Masks/191108_1_Mask.tif",
+                    "extension": ".tif",
+                    "filesize": 7025372
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        9262.0,
+                        4815.0
+                    ],
+                    [
+                        11915.0,
+                        4815.0
+                    ],
+                    [
+                        11915.0,
+                        7463.0
+                    ],
+                    [
+                        9262.0,
+                        7463.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 9262.0,
+                "x_max": 11915.0,
+                "y_min": 4815.0,
+                "y_max": 7463.0,
+                "width_px": 2653.0,
+                "height_px": 2648.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 90.0
+            },
+            "mask": {
+                "shape": [
+                    2648,
+                    2653
+                ],
+                "dtype": "uint8",
+                "unique_values": [
+                    0.0,
+                    1.0
+                ],
+                "unique_value_counts": {
+                    "0": 4440297,
+                    "1": 2584847
+                },
+                "total_pixels": 7025144,
+                "nonzero_pixels": 2584847,
+                "nonzero_percentage": 36.79,
+                "is_binary": true,
+                "native_alignment_verified": false,
+                "roi_dimension_match": true
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": true,
+                "has_native_image": false
+            }
+        },
+        "191114_3_overview": {
+            "sample_id": "191114_3_overview",
+            "files": {
+                "roi": {
+                    "filename": "191114_3_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/191114_3_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        5489.0,
+                        6140.0
+                    ],
+                    [
+                        8129.0,
+                        6140.0
+                    ],
+                    [
+                        8129.0,
+                        8780.0
+                    ],
+                    [
+                        5489.0,
+                        8780.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 5489.0,
+                "x_max": 8129.0,
+                "y_min": 6140.0,
+                "y_max": 8780.0,
+                "width_px": 2640.0,
+                "height_px": 2640.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 112.0
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": false,
+                "has_native_image": false
+            }
+        },
+        "191125_1_overview": {
+            "sample_id": "191125_1_overview",
+            "files": {
+                "roi": {
+                    "filename": "191125_1_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/191125_1_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 42
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                }
+            },
+            "quality_flags": [
+                "roi_preliminary_validation_failed"
+            ],
+            "roi": {
+                "coordinates": [
+                    [
+                        9518.0,
+                        4422.0
+                    ],
+                    [
+                        12158.0,
+                        4422.0
+                    ],
+                    [
+                        12158.0,
+                        7062.0
+                    ],
+                    [
+                        9518.0,
+                        7062.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 9518.0,
+                "x_max": 12158.0,
+                "y_min": 4422.0,
+                "y_max": 7062.0,
+                "width_px": 2640.0,
+                "height_px": 2640.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 20.0
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": false,
+                "issue": "outside_transformed_bounds",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": false,
+                "has_native_image": false
+            }
+        },
+        "191206_3_overview": {
+            "sample_id": "191206_3_overview",
+            "files": {
+                "roi": {
+                    "filename": "191206_3_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/191206_3_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        3126.0,
+                        4006.0
+                    ],
+                    [
+                        5774.0,
+                        4006.0
+                    ],
+                    [
+                        5774.0,
+                        6654.0
+                    ],
+                    [
+                        3126.0,
+                        6654.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 3126.0,
+                "x_max": 5774.0,
+                "y_min": 4006.0,
+                "y_max": 6654.0,
+                "width_px": 2648.0,
+                "height_px": 2648.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 35.0
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": false,
+                "has_native_image": false
+            }
+        },
+        "191210_4_overview": {
+            "sample_id": "191210_4_overview",
+            "files": {
+                "roi": {
+                    "filename": "191210_4_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/191210_4_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                },
+                "mask": {
+                    "filename": "191210_4_Mask.tif",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/Masks/191210_4_Mask.tif",
+                    "extension": ".tif",
+                    "filesize": 6969764
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        6080.0,
+                        2904.0
+                    ],
+                    [
+                        8720.0,
+                        2904.0
+                    ],
+                    [
+                        8720.0,
+                        5544.0
+                    ],
+                    [
+                        6080.0,
+                        5544.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 6080.0,
+                "x_max": 8720.0,
+                "y_min": 2904.0,
+                "y_max": 5544.0,
+                "width_px": 2640.0,
+                "height_px": 2640.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 32.0
+            },
+            "mask": {
+                "shape": [
+                    2640,
+                    2640
+                ],
+                "dtype": "uint8",
+                "unique_values": [
+                    0.0,
+                    1.0
+                ],
+                "unique_value_counts": {
+                    "0": 6166427,
+                    "1": 803173
+                },
+                "total_pixels": 6969600,
+                "nonzero_pixels": 803173,
+                "nonzero_percentage": 11.52,
+                "is_binary": true,
+                "native_alignment_verified": false,
+                "roi_dimension_match": true
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": true,
+                "has_native_image": false
+            }
+        },
+        "191211_3_overview": {
+            "sample_id": "191211_3_overview",
+            "files": {
+                "roi": {
+                    "filename": "191211_3_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/191211_3_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                },
+                "mask": {
+                    "filename": "191211_3_Mask.tif",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/Masks/191211_3_Mask.tif",
+                    "extension": ".tif",
+                    "filesize": 6969828
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        4751.0,
+                        3898.0
+                    ],
+                    [
+                        7391.0,
+                        3898.0
+                    ],
+                    [
+                        7391.0,
+                        6538.0
+                    ],
+                    [
+                        4751.0,
+                        6538.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 4751.0,
+                "x_max": 7391.0,
+                "y_min": 3898.0,
+                "y_max": 6538.0,
+                "width_px": 2640.0,
+                "height_px": 2640.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 0.0
+            },
+            "mask": {
+                "shape": [
+                    2640,
+                    2640
+                ],
+                "dtype": "uint8",
+                "unique_values": [
+                    0.0,
+                    1.0
+                ],
+                "unique_value_counts": {
+                    "0": 2167855,
+                    "1": 4801745
+                },
+                "total_pixels": 6969600,
+                "nonzero_pixels": 4801745,
+                "nonzero_percentage": 68.9,
+                "is_binary": true,
+                "native_alignment_verified": false,
+                "roi_dimension_match": true
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": true,
+                "has_native_image": false
+            }
+        },
+        "200102_1_overview": {
+            "sample_id": "200102_1_overview",
+            "files": {
+                "roi": {
+                    "filename": "200102_1_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/200102_1_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                },
+                "mask": {
+                    "filename": "200102_1_Mask.tif",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/Masks/200102_1_Mask.tif",
+                    "extension": ".tif",
+                    "filesize": 7871152
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        2928.0,
+                        7332.0
+                    ],
+                    [
+                        7168.0,
+                        7332.0
+                    ],
+                    [
+                        7168.0,
+                        9188.0
+                    ],
+                    [
+                        2928.0,
+                        9188.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 2928.0,
+                "x_max": 7168.0,
+                "y_min": 7332.0,
+                "y_max": 9188.0,
+                "width_px": 4240.0,
+                "height_px": 1856.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 72.0
+            },
+            "mask": {
+                "shape": [
+                    1856,
+                    4240
+                ],
+                "dtype": "uint8",
+                "unique_values": [
+                    0.0,
+                    1.0
+                ],
+                "unique_value_counts": {
+                    "0": 7064966,
+                    "1": 804474
+                },
+                "total_pixels": 7869440,
+                "nonzero_pixels": 804474,
+                "nonzero_percentage": 10.22,
+                "is_binary": true,
+                "native_alignment_verified": false,
+                "roi_dimension_match": true
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": true,
+                "has_native_image": false
+            }
+        },
+        "200106_2_overview": {
+            "sample_id": "200106_2_overview",
+            "files": {
+                "roi": {
+                    "filename": "200106_2_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/200106_2_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                },
+                "mask": {
+                    "filename": "200106_2_Mask.tif",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/Masks/200106_2_Mask.tif",
+                    "extension": ".tif",
+                    "filesize": 6969828
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        6870.0,
+                        3752.0
+                    ],
+                    [
+                        9510.0,
+                        3752.0
+                    ],
+                    [
+                        9510.0,
+                        6392.0
+                    ],
+                    [
+                        6870.0,
+                        6392.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 6870.0,
+                "x_max": 9510.0,
+                "y_min": 3752.0,
+                "y_max": 6392.0,
+                "width_px": 2640.0,
+                "height_px": 2640.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 138.0
+            },
+            "mask": {
+                "shape": [
+                    2640,
+                    2640
+                ],
+                "dtype": "uint8",
+                "unique_values": [
+                    0.0,
+                    1.0
+                ],
+                "unique_value_counts": {
+                    "0": 5327010,
+                    "1": 1642590
+                },
+                "total_pixels": 6969600,
+                "nonzero_pixels": 1642590,
+                "nonzero_percentage": 23.57,
+                "is_binary": true,
+                "native_alignment_verified": false,
+                "roi_dimension_match": true
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": true,
+                "has_native_image": false
+            }
+        },
+        "200214_1_overview": {
+            "sample_id": "200214_1_overview",
+            "files": {
+                "roi": {
+                    "filename": "200214_1_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/200214_1_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 38
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                },
+                "mask": {
+                    "filename": "200214_1_Mask.tif",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/Masks/200214_1_Mask.tif",
+                    "extension": ".tif",
+                    "filesize": 6691044
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        816.0,
+                        2514.0
+                    ],
+                    [
+                        3984.0,
+                        2514.0
+                    ],
+                    [
+                        3984.0,
+                        4626.0
+                    ],
+                    [
+                        816.0,
+                        4626.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 816.0,
+                "x_max": 3984.0,
+                "y_min": 2514.0,
+                "y_max": 4626.0,
+                "width_px": 3168.0,
+                "height_px": 2112.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 0.0
+            },
+            "mask": {
+                "shape": [
+                    2112,
+                    3168
+                ],
+                "dtype": "uint8",
+                "unique_values": [
+                    0.0,
+                    1.0
+                ],
+                "unique_value_counts": {
+                    "0": 5847714,
+                    "1": 843102
+                },
+                "total_pixels": 6690816,
+                "nonzero_pixels": 843102,
+                "nonzero_percentage": 12.6,
+                "is_binary": true,
+                "native_alignment_verified": false,
+                "roi_dimension_match": true
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": true,
+                "has_native_image": false
+            }
+        },
+        "200219_1_overview": {
+            "sample_id": "200219_1_overview",
+            "files": {
+                "roi": {
+                    "filename": "200219_1_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/200219_1_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                },
+                "mask": {
+                    "filename": "200219_1_Mask.tif",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/Masks/200219_1_Mask.tif",
+                    "extension": ".tif",
+                    "filesize": 6969748
+                }
+            },
+            "quality_flags": [
+                "mask_uses_0_255_encoding",
+                "roi_preliminary_validation_failed"
+            ],
+            "roi": {
+                "coordinates": [
+                    [
+                        4392.0,
+                        3039.0
+                    ],
+                    [
+                        7032.0,
+                        3039.0
+                    ],
+                    [
+                        7032.0,
+                        5679.0
+                    ],
+                    [
+                        4392.0,
+                        5679.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 4392.0,
+                "x_max": 7032.0,
+                "y_min": 3039.0,
+                "y_max": 5679.0,
+                "width_px": 2640.0,
+                "height_px": 2640.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 140.0
+            },
+            "mask": {
+                "shape": [
+                    2640,
+                    2640
+                ],
+                "dtype": "uint8",
+                "unique_values": [
+                    0.0,
+                    255.0
+                ],
+                "unique_value_counts": {
+                    "0": 4187999,
+                    "255": 2781601
+                },
+                "total_pixels": 6969600,
+                "nonzero_pixels": 2781601,
+                "nonzero_percentage": 39.91,
+                "is_binary": true,
+                "native_alignment_verified": false,
+                "roi_dimension_match": true
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": false,
+                "issue": "outside_transformed_bounds",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": true,
+                "has_native_image": false
+            }
+        },
+        "200318_1_overview": {
+            "sample_id": "200318_1_overview",
+            "files": {
+                "roi": {
+                    "filename": "200318_1_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/200318_1_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                }
+            },
+            "quality_flags": [
+                "roi_preliminary_validation_failed"
+            ],
+            "roi": {
+                "coordinates": [
+                    [
+                        4499.0,
+                        2952.0
+                    ],
+                    [
+                        7937.0,
+                        2952.0
+                    ],
+                    [
+                        7937.0,
+                        5068.0
+                    ],
+                    [
+                        4499.0,
+                        5068.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 4499.0,
+                "x_max": 7937.0,
+                "y_min": 2952.0,
+                "y_max": 5068.0,
+                "width_px": 3438.0,
+                "height_px": 2116.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 96.0
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": false,
+                "issue": "outside_transformed_bounds",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": false,
+                "has_native_image": false
+            }
+        },
+        "200318_2_overview": {
+            "sample_id": "200318_2_overview",
+            "files": {
+                "roi": {
+                    "filename": "200318_2_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/200318_2_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                },
+                "mask": {
+                    "filename": "200318_2_Mask.tif",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/Masks/200318_2_Mask.tif",
+                    "extension": ".tif",
+                    "filesize": 3731988
+                }
+            },
+            "quality_flags": [
+                "roi_preliminary_validation_failed"
+            ],
+            "roi": {
+                "coordinates": [
+                    [
+                        1980.0,
+                        1740.0
+                    ],
+                    [
+                        6240.0,
+                        1740.0
+                    ],
+                    [
+                        6240.0,
+                        2616.0
+                    ],
+                    [
+                        1980.0,
+                        2616.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 1980.0,
+                "x_max": 6240.0,
+                "y_min": 1740.0,
+                "y_max": 2616.0,
+                "width_px": 4260.0,
+                "height_px": 876.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 157.0
+            },
+            "mask": {
+                "shape": [
+                    876,
+                    4260
+                ],
+                "dtype": "uint8",
+                "unique_values": [
+                    0.0,
+                    1.0
+                ],
+                "unique_value_counts": {
+                    "0": 3233381,
+                    "1": 498379
+                },
+                "total_pixels": 3731760,
+                "nonzero_pixels": 498379,
+                "nonzero_percentage": 13.36,
+                "is_binary": true,
+                "native_alignment_verified": false,
+                "roi_dimension_match": true
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": false,
+                "issue": "outside_transformed_bounds",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": true,
+                "has_native_image": false
+            }
+        },
+        "200502_2_overview": {
+            "sample_id": "200502_2_overview",
+            "files": {
+                "roi": {
+                    "filename": "200502_2_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/200502_2_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 40
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        4670.0,
+                        4790.0
+                    ],
+                    [
+                        7318.0,
+                        4790.0
+                    ],
+                    [
+                        7318.0,
+                        7430.0
+                    ],
+                    [
+                        4670.0,
+                        7430.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 4670.0,
+                "x_max": 7318.0,
+                "y_min": 4790.0,
+                "y_max": 7430.0,
+                "width_px": 2648.0,
+                "height_px": 2640.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 56.0
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": false,
+                "has_native_image": false
+            }
+        },
+        "201125_1_overview": {
+            "sample_id": "201125_1_overview",
+            "files": {
+                "roi": {
+                    "filename": "201125_1_overview.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/ROIvalues/201125_1_overview.txt",
+                    "extension": ".txt",
+                    "filesize": 44
+                },
+                "orientation": {
+                    "filename": "orientationStack.txt",
+                    "path": "/Users/rakshanpatnaik/Desktop/D37-Semantic-Data-Lake/datasets/ventricular data/orientationStack.txt",
+                    "extension": ".txt",
+                    "filesize": 280
+                }
+            },
+            "quality_flags": [],
+            "roi": {
+                "coordinates": [
+                    [
+                        7528.0,
+                        9165.0
+                    ],
+                    [
+                        10180.0,
+                        9165.0
+                    ],
+                    [
+                        10180.0,
+                        11817.0
+                    ],
+                    [
+                        7528.0,
+                        11817.0
+                    ]
+                ],
+                "point_count": 4,
+                "x_min": 7528.0,
+                "x_max": 10180.0,
+                "y_min": 9165.0,
+                "y_max": 11817.0,
+                "width_px": 2652.0,
+                "height_px": 2652.0,
+                "coordinate_frame": "native_transformed_image_unverified"
+            },
+            "orientation": {
+                "rotation_angle": 0.0
+            },
+            "included_in_study": true,
+            "roi_validation": {
+                "valid_preliminary": true,
+                "issue": "none",
+                "status": "metadata_only_not_native_verified"
+            },
+            "relationships": {
+                "has_roi": true,
+                "has_orientation": true,
+                "has_mask": false,
+                "has_native_image": false
+            }
+        }
+    }
+}
