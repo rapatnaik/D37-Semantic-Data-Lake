@@ -2,7 +2,12 @@
 name = "d37-semantic-data-lake"
 version = "0.1.0"
 requires-python = ">=3.11"
-dependencies = ["duckdb", "pandas"]
+dependencies = [
+    "duckdb",
+    "numpy>=2.4.6",
+    "pandas",
+    "tifffile>=2026.3.3",
+]
 
 [tool.uv.workspace]
 members = []
