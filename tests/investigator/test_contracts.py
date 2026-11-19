@@ -75,3 +75,49 @@ class ContractTests(unittest.TestCase):
         self.result.inputs = ['other']
         with self.assertRaises(ValueError):
             self.result.validate_references(self.inventory)
+
+    def test_sampled_coverage_round_trip(self):
+        # To ensure that agent does not misinterpret sample measurement for a full dataset measurement.
+        coverage = Coverage(
+            mode='sample',
+            unit='rows',
+            examined=100,
+            total=1000,
+            selection='random sample',
+            seed=42
+        )
+        restored = Coverage.from_json(coverage.to_json())
+        self.assertEqual(restored, coverage)
+        self.assertEqual(restored.mode, 'sample')
+        self.assertEqual(restored.examined, 100)
+        self.assertEqual(restored.total, 1000)
+        self.assertEqual(restored.seed, 42)
+
+    def test_incomplete_result_preserves_limitations(self):
+        # To ensure that unsuccessful or partial analyses is retained and preserved.
+        result = ToolResult(
+            result_id='r_partial',
+            component_id='c',
+            status='partial',
+            inputs=['s'],
+            method='sample_profile',
+            parameters={'max_rows': 100},
+            coverage=Coverage(
+                mode='sample',
+                unit='rows',
+                examined=100,
+                total=1000,
+                selection='first 100 rows'
+            ),
+            measurements={'row_count_sampled': 100},
+            limitations=['Only the first 100 rows were examined.']
+        )
+
+        result.validate_references(self.inventory)
+
+        restored = ToolResult.from_json(result.to_json())
+
+        self.assertEqual(restored.status, 'partial')
+        self.assertEqual(restored.coverage.mode, 'sample')
+        self.assertEqual(restored.limitations, ['Only the first 100 rows were examined.'])
+        self.assertEqual(restored.parameters['max_rows'], 100)

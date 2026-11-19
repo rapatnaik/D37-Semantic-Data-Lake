@@ -8,6 +8,8 @@ from unittest.mock import patch
 from agents.investigator import discover
 from examples.investigator_starter import FIXTURE_ROOT, run_example
 
+from zipfile import ZipFile
+
 
 class DiscoveryTests(unittest.TestCase):
     def test_stable_ids_and_sorted_recursive_inventory(self):
@@ -34,7 +36,7 @@ class DiscoveryTests(unittest.TestCase):
             root = Path(folder)
             for name in ('.env', 'credentials.json', 'secret.txt', 'id_rsa', 'private.key'):
                 (root / name).write_text('do not inspect')
-            for name in ('.git', '.aws', '.d37-agent', 'node_modules'):
+            for name in ('.git', '.aws', '.d37-agent', 'node_modules','output','outputs'):
                 (root / name).mkdir()
                 (root / name / 'data.csv').write_text('do not inspect')
             target = Path(outside) / 'outside.csv'
@@ -48,6 +50,38 @@ class DiscoveryTests(unittest.TestCase):
                 inventory = discover(root)
             self.assertEqual(inventory.sources, [])
 
+    def test_office_zip_detection(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            # ZIP containers test with each type file per case
+            with ZipFile(root / 'workbook.xlsx', 'w') as archive:
+                archive.writestr('xl/workbook.xml', '<workbook/>')
+            with ZipFile(root / 'document.docx', 'w') as archive:
+                archive.writestr('word/document.xml', '<document/>')
+            with ZipFile(root / 'ordinary.zip', 'w') as archive:
+                archive.writestr('notes.txt', 'hello')
+
+            inventory = discover(root)
+
+            observed = {
+                source.relative_path: (source.format, component.kind)
+                for source, component in zip(
+                    inventory.sources, inventory.components
+                )
+            }
+            self.assertEqual(
+                observed['workbook.xlsx'],
+                ('xlsx', 'table')
+            )
+            self.assertEqual(
+                observed['document.docx'],
+                ('docx', 'documents')
+            )
+            self.assertEqual(
+                observed['ordinary.zip'],
+                ('zip', 'unknown')
+            )
+
     def test_format_candidates_and_unsupported_inputs(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
@@ -58,6 +92,9 @@ class DiscoveryTests(unittest.TestCase):
                 'd.xlsx': (b'PK\x03\x04', 'zip', 'unknown'),
                 'e.csv': (b'\x00\xff', 'unknown', 'unknown'),
                 'f.py': (b'raise RuntimeError("never execute")', 'unknown', 'unknown'),
+                'g.json': (b'[{"age": 20}]', 'json', 'table'),
+                'h.jsonl': (b'{"age": 20}\n{"age": 25}\n', 'jsonl', 'table'),
+                'i.parquet': (b'PAR1', 'parquet', 'table'),
             }
             for name, (data, _, _) in samples.items():
                 (root / name).write_bytes(data)
@@ -78,6 +115,28 @@ class DiscoveryTests(unittest.TestCase):
             self.assertEqual(inventory.sources[0].format, 'unknown')
             self.assertTrue(any('PermissionError' in entry for entry in inventory.limitations))
 
+    def test_unsupported_files_remain_in_inventory(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            # for downstream agents to know unknown inputs were discovered but not interpreted
+            (root / 'mystery.bin').write_bytes(b'\x00\x01\x02')
+            inventory = discover(root)
+
+            self.assertEqual(len(inventory.sources), 1)
+            self.assertEqual(len(inventory.components), 1)
+
+            source = inventory.sources[0]
+            component = inventory.components[0]
+            self.assertEqual(source.relative_path, 'mystery.bin')
+            self.assertEqual(source.format, 'unknown')
+            self.assertEqual(component.kind, 'unknown')
+            self.assertTrue(
+                any(
+                    'mystery.bin' in limitation
+                    for limitation in inventory.limitations
+                )
+            )
+
     def test_fixture_measurements_and_preservation(self):
         paths = list(FIXTURE_ROOT.iterdir())
         before = {path: (path.read_bytes(), path.stat().st_mtime_ns) for path in paths}
@@ -96,3 +155,94 @@ class DiscoveryTests(unittest.TestCase):
                 discover(path)
             with self.assertRaises(FileNotFoundError):
                 discover(Path(folder) / 'missing')
+
+    def test_mixed_format_directory(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+
+            # directory with multiple types of data combined
+            (root / 'tables').mkdir()
+            (root / 'images').mkdir()
+            (root / 'documents').mkdir()
+            (root / 'outputs').mkdir()
+            # testing if nested directories are traversed correctly
+            (root / 'tables' / 'patients.csv').write_text(
+                'patient_id,age\n1,45\n2,60\n'
+            )
+            (root / 'tables' / 'records.jsonl').write_text(
+                '{"patient_id": 1}\n{"patient_id": 2}\n'
+            )
+            (root / 'images' / 'scan.png').write_bytes(
+                b'\x89PNG\r\n\x1a\n'
+            )
+            (root / 'documents' / 'readme.md').write_text(
+                '# Study documentation'
+            )
+            (root / 'outputs' / 'generated.csv').write_text(
+                'result\n100\n'
+            )
+            inventory = discover(root)
+            observed = {
+                source.relative_path: (
+                    source.format,
+                    next(
+                        component.kind
+                        for component in inventory.components
+                        if source.source_id in component.source_ids
+                    )
+                )
+                for source in inventory.sources
+            }
+            self.assertEqual(
+                observed,
+                {
+                    'documents/readme.md': ('md', 'documents'),
+                    'images/scan.png': ('png', 'images'),
+                    'tables/patients.csv': ('csv', 'table'),
+                    'tables/records.jsonl': ('jsonl', 'table'),
+                }
+            )
+            self.assertEqual(len(inventory.sources), 4)
+            self.assertEqual(len(inventory.components), 4)
+            # passes contract validation
+            inventory.validate()
+
+    def test_mismatched_file_signatures(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            # examples where content is not what file signature claims
+            (root / 'fake.pdf').write_text('not a PDF')
+            (root / 'fake.png').write_text('not an image')
+            (root / 'fake.xlsx').write_bytes(b'PK\x03\x04')
+            (root / 'fake.docx').write_bytes(b'PK\x03\x04')
+
+            inventory = discover(root)
+            observed = {
+                source.relative_path: (
+                    source.format,
+                    next(
+                        component.kind
+                        for component in inventory.components
+                        if source.source_id in component.source_ids
+                    )
+                )
+                for source in inventory.sources
+            }
+
+            self.assertEqual(
+                observed,
+                {
+                    'fake.pdf': ('unknown', 'unknown'),
+                    'fake.png': ('unknown', 'unknown'),
+                    'fake.xlsx': ('zip', 'unknown'),
+                    'fake.docx': ('zip', 'unknown'),
+                }
+            )
+            # so unsupported inputs remain documented
+            for filename in observed:
+                self.assertTrue(
+                    any(
+                        filename in limitation
+                        for limitation in inventory.limitations
+                    )
+                )

@@ -9,8 +9,9 @@ from pathlib import Path
 
 from .contracts import ComponentRef, Inventory, SourceRef
 
-_PREFIX_BYTES = 4096
+from zipfile import ZipFile, BadZipFile
 
+_PREFIX_BYTES = 4096
 
 def _id(prefix: str, value: object) -> str:
     encoded = json.dumps(value, sort_keys=True, ensure_ascii=True).encode()
@@ -21,11 +22,27 @@ def _excluded(name: str) -> bool:
     lower = name.lower()
     return (
         lower.startswith('.')
-        or lower in {'__pycache__', 'node_modules', 'credentials', 'secrets', 'env', 'venv'}
+        or lower in {'__pycache__', 'node_modules', 'credentials', 'secrets', 'env', 'venv','output','outputs'}
         or any(word in lower for word in ('credential', 'secret', 'token', 'password'))
         or lower.startswith(('id_rsa', 'id_ed25519', 'id_ecdsa'))
         or Path(lower).suffix in {'.pem', '.key', '.p12', '.pfx', '.keystore'}
     )
+
+
+def _identify_zip(path: Path) -> tuple[str, str]:
+    # Classify Office ZIP file into Document or Excel table without extracting files
+    try:
+        with ZipFile(path) as archive:
+            names = set(archive.namelist())
+
+            if 'xl/workbook.xml' in names:
+                return 'xlsx', 'table'
+            if 'word/document.xml' in names:
+                return 'docx', 'documents'
+    except (BadZipFile, OSError, ValueError):
+        pass
+
+    return 'zip', 'unknown'
 
 
 def _identify(path: Path, prefix: bytes) -> tuple[str, str]:
@@ -36,22 +53,25 @@ def _identify(path: Path, prefix: bytes) -> tuple[str, str]:
     ):
         if prefix.startswith(signature):
             return format_name, 'images'
+    if prefix.startswith(b'PAR1'):
+        return 'parquet', 'table'
     if prefix.startswith(b'%PDF-'):
         return 'pdf', 'documents'
     # ZIP containers could be Excel/DOCX, but require a dedicated reader.
     if prefix.startswith(b'PK\x03\x04'):
-        return 'zip', 'unknown'
+        return _identify_zip(path)
     try:
         prefix.decode('utf-8-sig', errors='strict')
         text_like = b'\x00' not in prefix
     except UnicodeDecodeError:
         text_like = False
     suffix = path.suffix.lower()
-    if text_like and suffix in {'.csv', '.tsv'}:
+    if text_like and suffix in {'.csv', '.tsv', '.json', '.jsonl'}:
         return suffix[1:], 'table'
     if text_like and suffix in {'.txt', '.md'}:
         return suffix[1:], 'documents'
     return 'unknown', 'unknown'
+
 
 
 def discover(root: str | Path) -> Inventory:
@@ -67,11 +87,15 @@ def discover(root: str | Path) -> Inventory:
     sources: list[SourceRef] = []
     components: list[ComponentRef] = []
     limitations = [
-        'Format candidates use signatures and at most 4096 prefix bytes; contents are not profiled.',
-        'CSV/TSV and text labels use UTF-8 prefixes and extensions; parsing is not validated.',
+        'Format labels are candidates, not validated file contents.',
+        'Discovery uses file signatures, extensions, and bounded prefix reads; parsing is handled by downstream tools.',
+        'ZIP-based Office formats are identified by internal filenames, not by validating workbook or document content.',
         'No Excel sheets, image pixels, document contents, or collection associations are inspected.',
-        'Hidden entries, common credential names, caches, and all symlinks are excluded; secret contents are not detected.',
+        'Hidden entries, common credential names, caches, generated output directories, and symlinks are excluded.',
+        'Filename exclusions cannot detect arbitrary secrets stored inside otherwise eligible files.',
+        'Discovery is read-only but is not a complete sandbox against concurrent filesystem changes.',
     ]
+
 
     def walk_error(error: OSError) -> None:
         # Do not leak absolute dataset roots through error messages.
