@@ -13,7 +13,7 @@ def build_metadata(
     component_id: str,
     results: Iterable[ToolResult],
 ) -> dict:
-    # invalid component
+    # invalid component id
     if not isinstance(component_id, str) or not component_id.strip():
         raise ValueError("component_id must be a nonempty string")
     # input is not ToolResult (output of analyses)
