@@ -10,6 +10,7 @@ Original source files are never modified.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import random
 from pathlib import Path
@@ -17,7 +18,8 @@ from typing import Any
 
 import pandas as pd
 
-from ..contracts import Coverage, SourceRef, ToolResult
+from ..contracts import ArtifactRef, Coverage, SourceRef, ToolResult
+
 
 
 SUPPORTED_FORMATS = {
@@ -394,7 +396,7 @@ def profile_table(
                 total_rows
             )
 
-            return ToolResult(
+            result = ToolResult(
                 result_id=context.result_id,
                 component_id=context.component_id,
                 status="complete",
@@ -425,6 +427,7 @@ def profile_table(
                     "verified against the complete dataset."
                 ]
             )
+            return attach_table_plots(result, df, source, context)
 
         # ---------------------------------------------
         # Case 2: Large unsupported sampling format
@@ -449,11 +452,12 @@ def profile_table(
         measurements = calculate_table_statistics(df)
         measurements["profile_scope"] = "full"
 
-        return make_result(
+        result = make_result(
             "complete",
             measurements=measurements,
             examined=len(df)
         )
+        return attach_table_plots(result, df, source, context)
 
     except Exception as error:
         return make_result(
@@ -616,3 +620,46 @@ def plot_table_profile(
         generated.append(target)
 
     return generated
+
+
+
+
+def attach_table_plots(
+    result: ToolResult,
+    df: pd.DataFrame,
+    source: SourceRef,
+    context: Any
+) -> ToolResult:
+    """
+    Generate EDA plots and register them in the ToolResult.
+
+    The output paths are relative to context.output_dir.
+    Original source files are never modified.
+    """
+    token = hashlib.sha256(
+        source.source_id.encode("utf-8")
+    ).hexdigest()[:16]
+
+    relative_dir = f"tables/{token}/profile"
+
+    output_root = Path(context.output_dir).resolve()
+    plot_dir = (output_root / relative_dir).resolve()
+
+    if not plot_dir.is_relative_to(output_root):
+        raise ValueError("Plot path escapes output directory.")
+
+    paths = plot_table_profile(df, plot_dir)
+
+    for index, path in enumerate(paths):
+        relative_path = path.relative_to(output_root).as_posix()
+
+        result.artifacts.append(
+            ArtifactRef(
+                artifact_id=f"table_plot_{token}_{index}",
+                relative_path=relative_path,
+                media_type="image/png"
+            )
+        )
+
+    result.validate()
+    return result

@@ -549,5 +549,130 @@ class TableTests(unittest.TestCase):
             )
 
 
+    # ---------------------------------------------------------
+    # 15. Full profiling registers PNG artifacts
+    # ---------------------------------------------------------
+
+    def test_profile_table_registers_png_artifacts(self):
+        """Full profiling creates real PNGs referenced by ToolResult."""
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            path = root / "patients.csv"
+            path.write_text(
+                "patient_id,age,cholesterol\n"
+                "P1,40,200\n"
+                "P2,,250\n"
+                "P3,60,300\n",
+                encoding="utf-8"
+            )
+            original_bytes = path.read_bytes()
+            stat = path.stat()
+
+            source = SourceRef(
+                source_id="source_png_integration",
+                relative_path="patients.csv",
+                format="csv",
+                size_bytes=stat.st_size,
+                mtime_ns=stat.st_mtime_ns
+            )
+            context = SimpleNamespace(
+                dataset_root=root,
+                output_dir=root / "outputs",
+                component_id="component_png_integration",
+                result_id="result_png_integration",
+                seed=42,
+                limits={},
+                resolve_source=lambda item: root / item.relative_path
+            )
+
+            result = profile_table(source, context)
+
+            self.assertEqual(result.status, "complete", result.limitations)
+            self.assertEqual(result.coverage.mode, "full")
+            self.assertEqual(len(result.artifacts), 2)
+            self.assertEqual(path.read_bytes(), original_bytes)
+
+            filenames = set()
+            for artifact in result.artifacts:
+                self.assertEqual(artifact.media_type, "image/png")
+                relative_path = Path(artifact.relative_path)
+                self.assertFalse(relative_path.is_absolute())
+                saved_path = (context.output_dir / relative_path).resolve()
+                self.assertTrue(saved_path.is_relative_to(context.output_dir.resolve()))
+                self.assertTrue(saved_path.is_file())
+                self.assertEqual(saved_path.read_bytes()[:8], b"\x89PNG\r\n\x1a\n")
+                filenames.add(saved_path.name)
+
+            self.assertEqual(
+                filenames,
+                {"missing_values.png", "numeric_distributions.png"}
+            )
+            restored = ToolResult.from_json(result.to_json())
+            self.assertEqual(len(restored.artifacts), 2)
+
+    # ---------------------------------------------------------
+    # 16. Sampled profiling also registers PNG artifacts
+    # ---------------------------------------------------------
+
+    def test_sampled_profile_registers_png_artifacts(self):
+        """Sampled profile plots are saved without claiming full coverage."""
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            path = root / "large.csv"
+            pd.DataFrame({
+                "patient_id": range(1500),
+                "age": [30 + i % 50 for i in range(1500)],
+                "cholesterol": [150 + i % 100 for i in range(1500)]
+            }).to_csv(path, index=False)
+            original_bytes = path.read_bytes()
+            stat = path.stat()
+
+            source = SourceRef(
+                source_id="source_sampled_png",
+                relative_path="large.csv",
+                format="csv",
+                size_bytes=stat.st_size,
+                mtime_ns=stat.st_mtime_ns
+            )
+            context = SimpleNamespace(
+                dataset_root=root,
+                output_dir=root / "outputs",
+                component_id="component_sampled_png",
+                result_id="result_sampled_png",
+                seed=42,
+                limits={},
+                resolve_source=lambda item: root / item.relative_path
+            )
+
+            with patch(
+                "agents.investigator.tools.tables.MAX_SOURCE_BYTES", 100
+            ):
+                result = profile_table(source, context)
+
+            self.assertEqual(result.status, "complete", result.limitations)
+            self.assertEqual(result.coverage.mode, "sample")
+            self.assertEqual(result.coverage.examined, 1000)
+            self.assertEqual(result.coverage.total, 1500)
+            self.assertEqual(result.measurements["profile_scope"], "sample")
+            self.assertIsNone(
+                result.measurements["columns"]["patient_id"]["candidate_key"]
+            )
+            self.assertEqual(len(result.artifacts), 2)
+            self.assertEqual(path.read_bytes(), original_bytes)
+
+            for artifact in result.artifacts:
+                self.assertEqual(artifact.media_type, "image/png")
+                saved_path = (context.output_dir / artifact.relative_path).resolve()
+                self.assertTrue(saved_path.is_relative_to(context.output_dir.resolve()))
+                self.assertTrue(saved_path.is_file())
+                self.assertEqual(saved_path.read_bytes()[:8], b"\x89PNG\r\n\x1a\n")
+
+            restored = ToolResult.from_json(result.to_json())
+            self.assertEqual(restored.coverage.mode, "sample")
+            self.assertEqual(len(restored.artifacts), 2)
+
+
 if __name__ == "__main__":
     unittest.main()
