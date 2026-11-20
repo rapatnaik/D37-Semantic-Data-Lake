@@ -256,6 +256,7 @@ def _rlimits(limits: Any) -> Any:
 
 
 
+
 def _run_process(
     job_dir: Path,
     inputs: list[tuple[SourceRef, Path]],
@@ -317,12 +318,30 @@ def _run_process(
         except subprocess.TimeoutExpired:
 
             if os.name == "nt":
-                # Windows does not provide os.killpg().
-                # Terminate the worker and wait for it to exit.
-                process.kill()
+                # Windows: stop the worker and child processes.
+                try:
+                    subprocess.run(
+                        [
+                            "taskkill",
+                            "/PID", str(process.pid),
+                            "/T",
+                            "/F",
+                        ],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        check=False,
+                        timeout=10,
+                    )
+
+                except (OSError, subprocess.TimeoutExpired):
+                    pass
+
+                # Fallback if the worker is still alive.
+                if process.poll() is None:
+                    process.kill()
 
             else:
-                # Preserve existing Unix process-group cleanup.
+                # Linux/macOS: stop the process group.
                 try:
                     os.killpg(
                         process.pid,
@@ -331,7 +350,7 @@ def _run_process(
                 except ProcessLookupError:
                     pass
 
-            # Reap the terminated worker before cleanup.
+            # Wait until the worker has exited.
             process.wait()
 
             return None, True
