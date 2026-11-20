@@ -6,6 +6,7 @@ Covers file reading, missingness, numeric statistics,
 duplicates, candidate keys, sampling, contracts, and plots.
 """
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -673,6 +674,136 @@ class TableTests(unittest.TestCase):
             self.assertEqual(restored.coverage.mode, "sample")
             self.assertEqual(len(restored.artifacts), 2)
 
+
+
+    # ---------------------------------------------------------
+    # 17-25. Additional tabular format and error-handling tests
+    # ---------------------------------------------------------
+
+    def test_tsv_reading(self):
+        """Tab-delimited patient data should load with the right columns."""
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "patients.tsv"
+            path.write_text(
+                "patient_id\tage\tcholesterol\n"
+                "P1\t40\t200\n"
+                "P2\t50\t250\n",
+                encoding="utf-8",
+            )
+            df = read_table(path)
+            self.assertEqual(list(df.columns), ["patient_id", "age", "cholesterol"])
+            self.assertEqual(df["cholesterol"].tolist(), [200, 250])
+
+    def test_parquet_reading_preserves_column_types(self):
+        """Parquet round trips retain integer, float, and string columns."""
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "patients.parquet"
+            original = pd.DataFrame({
+                "patient_id": ["P1", "P2"],
+                "age": pd.Series([40, 50], dtype="int64"),
+                "cholesterol": pd.Series([200.5, 250.0], dtype="float64"),
+            })
+            original.to_parquet(path, index=False)
+            loaded = read_table(path)
+            pd.testing.assert_frame_equal(loaded, original)
+
+    def test_xlsx_reading(self):
+        """The default worksheet of a real XLSX file is readable."""
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "patients.xlsx"
+            original = pd.DataFrame({
+                "patient_id": ["P1", "P2"],
+                "age": [40, 50],
+            })
+            original.to_excel(path, index=False)
+            loaded = read_table(path)
+            pd.testing.assert_frame_equal(loaded, original)
+
+    def test_xls_dispatches_to_excel_reader(self):
+        """Legacy XLS paths use pandas' Excel reader.
+
+        This is a routing test, not an end-to-end legacy XLS decode test.
+        An actual XLS fixture and xlrd are needed for that separate check.
+        """
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "patients.xls"
+            expected = pd.DataFrame({"age": [40, 50]})
+            with patch(
+                "agents.investigator.tools.tables.pd.read_excel",
+                return_value=expected,
+            ) as excel_reader:
+                loaded = read_table(path)
+            excel_reader.assert_called_once_with(path, sheet_name=0)
+            pd.testing.assert_frame_equal(loaded, expected)
+
+    def test_json_records_reading(self):
+        """A JSON list of objects becomes a table."""
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "patients.json"
+            records = [
+                {"patient_id": "P1", "age": 40},
+                {"patient_id": "P2", "age": 50},
+            ]
+            path.write_text(json.dumps(records), encoding="utf-8")
+            df = read_table(path)
+            self.assertEqual(df["patient_id"].tolist(), ["P1", "P2"])
+            self.assertEqual(df["age"].tolist(), [40, 50])
+
+    def test_jsonl_records_reading(self):
+        """One JSON record per line becomes one table row."""
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "patients.jsonl"
+            path.write_text(
+                '{"patient_id":"P1","age":40}\n'
+                '{"patient_id":"P2","age":50}\n',
+                encoding="utf-8",
+            )
+            df = read_table(path)
+            self.assertEqual(df.shape, (2, 2))
+            self.assertEqual(df["age"].tolist(), [40, 50])
+
+    def test_json_rejects_non_list_root(self):
+        """A JSON object root is not silently treated as a records table."""
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "patients.json"
+            path.write_text('{"age":40}', encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "list of records"):
+                read_table(path)
+
+    def test_json_rejects_non_object_records(self):
+        """Rows in a JSON records list must be objects."""
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "patients.json"
+            path.write_text('[{"age":40}, 50]', encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "must be objects"):
+                read_table(path)
+
+    def test_malformed_json_is_rejected(self):
+        """Truncated JSON should fail instead of silently returning data."""
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "patients.json"
+            path.write_text('[{"age":40}', encoding="utf-8")
+            with self.assertRaises(json.JSONDecodeError):
+                read_table(path)
+
+    def test_missing_values_across_delimited_and_json_formats(self):
+        """Empty CSV/TSV cells and JSON null remain missing, not zero."""
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            csv_path = root / "patients.csv"
+            tsv_path = root / "patients.tsv"
+            json_path = root / "patients.json"
+            csv_path.write_text("age,cholesterol\n40,200\n,0\n", encoding="utf-8")
+            tsv_path.write_text("age\tcholesterol\n40\t200\n\t0\n", encoding="utf-8")
+            json_path.write_text(
+                '[{"age":40,"cholesterol":200},{"age":null,"cholesterol":0}]',
+                encoding="utf-8",
+            )
+            for path in (csv_path, tsv_path, json_path):
+                with self.subTest(format=path.suffix):
+                    df = read_table(path)
+                    self.assertEqual(int(df["age"].isna().sum()), 1)
+                    self.assertEqual(df["cholesterol"].tolist(), [200, 0])
 
 if __name__ == "__main__":
     unittest.main()
