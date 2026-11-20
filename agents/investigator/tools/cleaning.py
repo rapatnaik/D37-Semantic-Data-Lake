@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -72,42 +73,86 @@ def _file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _valid_markers(markers: Any) -> bool:
+    """Accept finite scalar markers only; never interpret NaN as a code."""
+    return (
+        isinstance(markers, list)
+        and bool(markers)
+        and all(
+            type(value) in (str, int, float, bool)
+            and (type(value) is not float or math.isfinite(value))
+            for value in markers
+        )
+    )
+
+
+def _marker_equal(left: Any, right: Any) -> bool:
+    """Match documented marker types as well as values (True is not 1)."""
+    return type(left) is type(right) and left == right
+
+
+def _load_dictionary(
+    source: SourceRef, context: Any, rules: dict[str, Any]
+) -> tuple[dict[str, Any] | None, str, str | None]:
+    """Load an approved, source-specific JSON dictionary from dataset_root.
+
+    A free-form evidence string does not authorize any cleaning. The dictionary
+    itself needs to be curated/trusted by the dataset owner; path containment
+    alone does not establish its authenticity.
+    """
+    relative = rules.get("dictionary_relative_path")
+    if not isinstance(relative, str) or not relative.strip():
+        return None, "No data dictionary file was specified.", None
+
+    root = Path(context.dataset_root).resolve(strict=True)
+    candidate = Path(relative)
+    if candidate.is_absolute() or ".." in candidate.parts:
+        return None, "Dictionary path is not an approved relative path.", None
+
+    try:
+        path = (root / candidate).resolve(strict=True)
+        if not path.is_relative_to(root) or not path.is_file():
+            return None, "Dictionary is outside the approved dataset root.", None
+        if path.stat().st_size > 1024 * 1024:
+            return None, "Dictionary exceeds the 1 MB limit.", None
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, UnicodeError) as error:
+        return None, f"Dictionary could not be loaded: {type(error).__name__}.", None
+
+    if not isinstance(document, dict) or document.get("source_id") != source.source_id:
+        return None, "Dictionary source_id does not match the table.", None
+    if not isinstance(document.get("columns"), dict):
+        return None, "Dictionary has no valid columns mapping.", None
+    return document, "", _file_sha256(path)
+
+
 def _apply_documented_rules(
     df: pd.DataFrame,
-    rules: dict[str, Any]
+    rules: dict[str, Any],
+    dictionary: dict[str, Any] | None = None,
+    dictionary_error: str = ""
 ) -> tuple[pd.DataFrame, list[dict[str, Any]]]:
+    """Apply only rules exactly authorized by a source-specific JSON dictionary.
+
+    Example rules:
+      {"dictionary_relative_path": "patients_dictionary.json",
+       "columns": {"cholesterol": {"missing_values": [0]}}}
+
+    The approved dictionary must contain:
+      {"source_id": "patients_source",
+       "columns": {"cholesterol": {"missing_values": [0]}}}
     """
-    Apply explicitly documented missing-value markers.
-
-    Example rule format:
-
-    {
-        "columns": {
-            "cholesterol": {
-                "missing_values": [0],
-                "evidence": "Dictionary says zero means missing"
-            }
-        }
-    }
-
-    The evidence must come from the dataset's data dictionary.
-    This function checks that evidence is supplied, but it
-    does not independently verify the dictionary.
-    """
-
     if df.columns.has_duplicates:
         raise ValueError("Duplicate column names are not supported.")
-
     if not isinstance(rules, dict):
         raise ValueError("Cleaning rules must be a dictionary.")
-
     column_rules = rules.get("columns", {})
-
     if not isinstance(column_rules, dict):
         raise ValueError("rules['columns'] must be a dictionary.")
 
     normalized = df.copy(deep=True)
     change_log = []
+    documented_columns = dictionary.get("columns", {}) if dictionary else {}
 
     for column, rule in column_rules.items():
         entry = {
@@ -117,100 +162,52 @@ def _apply_documented_rules(
             "affected_rows": 0,
             "reason": ""
         }
-
         if column not in normalized.columns:
             entry["reason"] = "Column does not exist."
-            change_log.append(entry)
-            continue
-
-        if not isinstance(rule, dict):
+        elif not isinstance(rule, dict):
             entry["reason"] = "Rule must be a dictionary."
-            change_log.append(entry)
-            continue
-
-        evidence = rule.get("evidence", "")
-        markers = rule.get("missing_values")
-
-        if not isinstance(evidence, str) or not evidence.strip():
-            entry["reason"] = (
-                "No explicit data-dictionary evidence supplied."
+        elif dictionary is None:
+            entry["reason"] = dictionary_error or "Verified dictionary required."
+        elif column not in documented_columns:
+            entry["reason"] = "Column is not documented in the dictionary."
+        else:
+            requested = rule.get("missing_values")
+            documented_entry = documented_columns[column]
+            documented = (
+                documented_entry.get("missing_values")
+                if isinstance(documented_entry, dict) else None
             )
-            change_log.append(entry)
-            continue
-
-        if not isinstance(markers, list) or not markers:
-            entry["reason"] = (
-                "No documented missing-value markers supplied."
-            )
-            change_log.append(entry)
-            continue
-
-        # Reject invalid markers instead of guessing.
-        if any(
-            type(value) not in (str, int, float, bool)
-            or (
-                type(value) is float
-                and not pd.notna(value)
-            )
-            for value in markers
-        ):
-            entry["reason"] = (
-                "Markers must be finite strings, integers, "
-                "floats, or booleans."
-            )
-            change_log.append(entry)
-            continue
-
-        series = normalized[column]
-        mask = pd.Series(False, index=normalized.index)
-
-        for marker in markers:
-
-            if type(marker) is bool:
-                if pd.api.types.is_bool_dtype(series):
-                    match = series.eq(marker)
-                else:
-                    continue
-
-            elif type(marker) is str:
-                if not (
-                    pd.api.types.is_string_dtype(series)
-                    or series.dtype == object
-                ):
-                    continue
-
-                match = series.map(
-                    lambda value: (
-                        isinstance(value, str)
-                        and value == marker
-                    )
-                )
-
-            elif type(marker) in (int, float):
-                if not (
-                    pd.api.types.is_numeric_dtype(series)
-                    and not pd.api.types.is_bool_dtype(series)
-                ):
-                    continue
-
-                match = series.eq(marker)
-
+            if not _valid_markers(requested):
+                entry["reason"] = "Invalid requested missing-value markers."
+            elif not _valid_markers(documented):
+                entry["reason"] = "No valid dictionary missing-value markers."
+            elif not all(any(_marker_equal(a, b) for b in documented) for a in requested):
+                entry["reason"] = "Requested markers are not documented for this column."
             else:
-                continue
-
-            mask = mask | match.fillna(False).astype(bool)
-
-        affected = int(mask.sum())
-
-        if affected:
-            normalized.loc[mask, column] = pd.NA
-
-        entry["status"] = "applied"
-        entry["affected_rows"] = affected
-        entry["reason"] = evidence
-
+                series = normalized[column]
+                mask = pd.Series(False, index=normalized.index)
+                for marker in requested:
+                    if type(marker) is bool:
+                        if not pd.api.types.is_bool_dtype(series):
+                            continue
+                        match = series.eq(marker)
+                    elif type(marker) is str:
+                        if not (pd.api.types.is_string_dtype(series) or series.dtype == object):
+                            continue
+                        match = series.map(lambda value: isinstance(value, str) and value == marker)
+                    else:
+                        if not (pd.api.types.is_numeric_dtype(series)
+                                and not pd.api.types.is_bool_dtype(series)):
+                            continue
+                        match = series.eq(marker)
+                    mask = mask | match.fillna(False).astype(bool)
+                affected = int(mask.sum())
+                if affected:
+                    normalized.loc[mask, column] = pd.NA
+                entry["status"] = "applied"
+                entry["affected_rows"] = affected
+                entry["reason"] = "Marker verified against source-specific JSON dictionary."
         change_log.append(entry)
-
     return normalized, change_log
 
 
@@ -296,9 +293,15 @@ def normalize_table(
         if rules is None:
             rules = {}
 
+        if not isinstance(rules, dict):
+            raise ValueError("Cleaning rules must be a dictionary.")
+
+        dictionary, dictionary_error, dictionary_sha256 = _load_dictionary(
+            source, context, rules
+        ) if rules.get("columns") else (None, "", None)
+
         normalized, changes = _apply_documented_rules(
-            df,
-            rules
+            df, rules, dictionary, dictionary_error
         )
 
         # Stable, safe filename based on the source ID.
@@ -365,10 +368,12 @@ def normalize_table(
             "normalized_relative_path": relative_parquet,
             "row_count": int(len(df)),
             "column_count": int(len(df.columns)),
+            "dictionary_relative_path": rules.get("dictionary_relative_path") if dictionary else None,
+            "dictionary_sha256": dictionary_sha256,
             "total_changed_cells": int(applied_changes),
             "rules": changes,
             "policy": (
-                "No changes without explicit data-dictionary evidence."
+                "Only source-specific JSON dictionary markers authorize changes."
             )
         }
 
