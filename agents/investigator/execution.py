@@ -255,37 +255,100 @@ def _rlimits(limits: Any) -> Any:
     return apply
 
 
-def _run_process(job_dir: Path, inputs: list[tuple[SourceRef, Path]], context: ExecutionContext) -> tuple[int | None, bool]:
+
+def _run_process(
+    job_dir: Path,
+    inputs: list[tuple[SourceRef, Path]],
+    context: ExecutionContext
+) -> tuple[int | None, bool]:
+    """
+    Run an analysis worker with a timeout.
+
+    Supports Windows and Unix process termination.
+    """
+
     for source, path in inputs:
         target = job_dir / "inputs" / source.relative_path
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(path, target)  # a copy: chmod below never touches originals
+
+        # Work on copies; never modify original datasets.
+        shutil.copyfile(path, target)
         target.chmod(0o444)
+
     for name in ("request.json", "sandbox.json", "code.py"):
         (job_dir / name).chmod(0o444)
+
     limits = context.config.limits
-    command = [sys.executable, "-I", str(WORKER_PATH), str(job_dir)]
-    with (job_dir / "stdout.log").open("wb") as out, (job_dir / "stderr.log").open("wb") as err:
+
+    command = [
+        sys.executable,
+        "-I",
+        str(WORKER_PATH),
+        str(job_dir)
+    ]
+
+    with (
+        (job_dir / "stdout.log").open("wb") as out,
+        (job_dir / "stderr.log").open("wb") as err
+    ):
         process = subprocess.Popen(
-            command, cwd=job_dir, env=_sandbox_env(job_dir), stdin=subprocess.DEVNULL,
-            stdout=out, stderr=err, start_new_session=True,
-            preexec_fn=_rlimits(limits) if os.name == "posix" else None,
+            command,
+            cwd=job_dir,
+            env=_sandbox_env(job_dir),
+            stdin=subprocess.DEVNULL,
+            stdout=out,
+            stderr=err,
+            start_new_session=True,
+            preexec_fn=(
+                _rlimits(limits)
+                if os.name == "posix"
+                else None
+            ),
         )
+
         try:
-            return process.wait(timeout=limits.analysis_timeout_seconds), False
+            return (
+                process.wait(
+                    timeout=limits.analysis_timeout_seconds
+                ),
+                False
+            )
+
         except subprocess.TimeoutExpired:
-            try:
-                os.killpg(process.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
+
+            if os.name == "nt":
+                # Windows does not provide os.killpg().
+                # Terminate the worker and wait for it to exit.
+                process.kill()
+
+            else:
+                # Preserve existing Unix process-group cleanup.
+                try:
+                    os.killpg(
+                        process.pid,
+                        signal.SIGKILL
+                    )
+                except ProcessLookupError:
+                    pass
+
+            # Reap the terminated worker before cleanup.
             process.wait()
+
             return None, True
+
         finally:
-            for source, _ in inputs:  # copies are disposable; keep fingerprints only
-                copy = job_dir / "inputs" / source.relative_path
+            # Remove disposable input copies.
+            for source, _ in inputs:
+                copy = (
+                    job_dir
+                    / "inputs"
+                    / source.relative_path
+                )
+
                 if copy.exists():
                     copy.chmod(0o644)
                     copy.unlink()
+
 
 
 def _docker_unavailable(config: Config) -> str | None:

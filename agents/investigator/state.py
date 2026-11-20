@@ -113,16 +113,81 @@ def new_run_id() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + secrets.token_hex(3)
 
 
+
 def _pid_alive(pid: int) -> bool:
+    """Check whether a process is running on Windows or Unix."""
+
     if pid <= 0:
         return False
+
+    if os.name == "nt":
+        import ctypes
+        from ctypes import wintypes
+
+        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+        STILL_ACTIVE = 259
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+
+        kernel32.OpenProcess.argtypes = [
+            wintypes.DWORD,
+            wintypes.BOOL,
+            wintypes.DWORD,
+        ]
+        kernel32.OpenProcess.restype = wintypes.HANDLE
+
+        kernel32.GetExitCodeProcess.argtypes = [
+            wintypes.HANDLE,
+            ctypes.POINTER(wintypes.DWORD),
+        ]
+        kernel32.GetExitCodeProcess.restype = wintypes.BOOL
+
+        kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+        kernel32.CloseHandle.restype = wintypes.BOOL
+
+        handle = kernel32.OpenProcess(
+            PROCESS_QUERY_LIMITED_INFORMATION,
+            False,
+            pid,
+        )
+
+        if not handle:
+            error = ctypes.get_last_error()
+
+            if error == 87:
+                # ERROR_INVALID_PARAMETER: process does not exist.
+                return False
+
+            # Access denied or another unexpected condition:
+            # treat as potentially alive rather than stealing a lock.
+            return True
+
+        try:
+            exit_code = wintypes.DWORD()
+
+            success = kernel32.GetExitCodeProcess(
+                handle,
+                ctypes.byref(exit_code),
+            )
+
+            if not success:
+                return True
+
+            return exit_code.value == STILL_ACTIVE
+
+        finally:
+            kernel32.CloseHandle(handle)
+
+    # Unix/Linux/macOS behavior.
     try:
         os.kill(pid, 0)
     except ProcessLookupError:
         return False
     except PermissionError:
         return True
+
     return True
+
 
 
 @dataclass
