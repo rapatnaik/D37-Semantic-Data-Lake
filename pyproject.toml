@@ -11,12 +11,18 @@ dependencies = [
     "pillow>=13.0.0",
     "pyarrow>=26.0.1",
     "tifffile>=2026.3.3",
+    "pypdf",
+    "python-docx",
+    "marimo",
 ]
 
 [project.scripts]
 d37-agent = "agents.investigator.cli:main"
 
 [dependency-groups]
+dev = [
+    "reportlab>=5.1.0",
+]
 # Installed only inside the isolated analysis worker image
 # (containers/investigator/Dockerfile), not in the local environment.
 worker = [

@@ -1,0 +1,81 @@
+"""D37 reproducible investigation notebook.
+
+Install marimo to launch: marimo edit notebook.py
+This notebook reads saved evidence only and never executes generated analyses.
+"""
+import marimo
+
+__generated_with = "0.1.0"
+app = marimo.App(width="full")
+
+
+@app.cell
+def _():
+    import json
+    from pathlib import Path
+    import marimo as mo
+    snapshot = json.loads(__D37_SNAPSHOT__)
+    return json, Path, mo, snapshot
+
+
+@app.cell
+def _(mo, snapshot):
+    mo.md(f"# D37 investigation: {snapshot['run_id']}\n\nSaved results; no new cloud calls.")
+    return
+
+
+@app.cell
+def _(mo, snapshot):
+    rows = []
+    for component in snapshot["inventory"]["components"]:
+        cid = component["component_id"]
+        result = snapshot["results"].get(cid, {})
+        coverage = result.get("coverage", {})
+        rows.append({"component": cid, "kind": component["kind"],
+                     "status": result.get("status", "not run"),
+                     "coverage": coverage.get("mode", "not measured"),
+                     "examined": coverage.get("examined"), "total": coverage.get("total")})
+    mo.ui.table(rows)
+    return
+
+
+@app.cell
+def _(mo, snapshot):
+    # Saved measurements and interpretations remain separate.
+    mo.md("## Evidence and semantic interpretations")
+    return
+
+
+@app.cell
+def _(mo, snapshot):
+    mo.accordion({cid: mo.md("```json\n" + __import__("json").dumps(result, indent=2) + "\n```")
+                  for cid, result in snapshot["results"].items()})
+    return
+
+
+@app.cell
+def _(mo, snapshot):
+    mo.accordion({cid: mo.md("**Saved interpretation (unverified)**\n```json\n" + __import__("json").dumps(result, indent=2) + "\n```")
+                  for cid, result in snapshot["semantics"].items()})
+    return
+
+
+@app.cell
+def _(Path, mo, snapshot):
+    # Launch from a reports/revision-NNN directory. Only show existing PNG files
+    # from the run's artifact tree; no generated Python code is evaluated.
+    run_root = Path(__file__).resolve().parents[2]
+    images = []
+    for result in snapshot["results"].values():
+        for artifact in result.get("artifacts", []):
+            relative = artifact.get("relative_path", "")
+            path = (run_root / relative).resolve()
+            if (artifact.get("media_type") == "image/png" and
+                path.is_relative_to(run_root) and path.is_file()):
+                images.append(mo.vstack([mo.md(f"`{relative}`"), mo.image(src=path)]))
+    mo.vstack(images) if images else mo.md("No saved PNG plots available.")
+    return
+
+
+if __name__ == "__main__":
+    app.run()
