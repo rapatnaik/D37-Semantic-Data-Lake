@@ -1,4 +1,3 @@
-
 # End-to-end integration of discovery, EDA tools, and metadata assembly.
 
 import json
@@ -127,11 +126,10 @@ class PipelineIntegrationTests(unittest.TestCase):
                 "complete"
             )
 
-            # UNCOMMENT ONCE DOCUMENT EXTRACTION TOOL IS DONE
-            # self.assertEqual(
-            #     results_by_kind["documents"].status,
-            #     "complete"
-            # )
+            self.assertEqual(
+                results_by_kind["documents"].status,
+                "complete"
+            )
 
             # Metadata must be saved for each component.
             self.assertEqual(
@@ -158,17 +156,16 @@ class PipelineIntegrationTests(unittest.TestCase):
                 20
             )
 
-            # UNCOMMENT ONCE DOCUMENT EXTRACTION TOOL IS DONE
-            # # verifying document metadata
-            # document_metadata = metadata_by_kind["documents"]
+            # verifying document metadata
+            document_metadata = metadata_by_kind["documents"]
 
-            # self.assertEqual(
-            #     document_metadata["results"][0]["status"],
-            #     "deferred"
-            # )
-            # self.assertTrue(
-            #     document_metadata["results"][0]["limitations"]
-            # )
+            self.assertEqual(
+                document_metadata["results"][0]["status"],
+                "deferred"
+            )
+            self.assertTrue(
+                document_metadata["results"][0]["limitations"]
+            )
 
             # check whether fallback report was generated
             report = (
