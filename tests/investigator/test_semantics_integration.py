@@ -1,5 +1,7 @@
 """Verify dictionary reconciliation, provenance, and selective resume."""
 
+import base64
+import io
 import json
 import os
 import re
@@ -11,6 +13,8 @@ import unittest
 from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
+
+from PIL import Image
 
 from agents import semantic_agent
 from agents.investigator import scheduler
@@ -337,3 +341,57 @@ class SemanticStageTests(unittest.TestCase):
                     self.assertEqual(actual[field], deterministic[field])
                 self.assertEqual(rows(actual, "code")[1]["status"], "conflict" if name == "b.csv" else "unresolved")
                 self.assertEqual(rows(actual, "code")[1]["count"], 2)
+
+    def test_tiff_vision_sends_the_saved_first_frame_and_reuses_it_on_resume(self):
+        first = Image.new("RGB", (16, 16), "red")
+        second = Image.new("RGB", (16, 16), "blue")
+        first.save(self.data / "stack.tif", save_all=True, append_images=[second])
+        first.save(self.data / "extra.png")
+        model = ModelSettings(endpoint="https://model.example/v1/chat/completions",
+                              api_key_env="D37_TEST_VISION_KEY")
+        config = replace(self.config, model=model)
+        completion = {"choices": [{"message": {"content": json.dumps({
+            "description": "A red preview.", "needs_verification": ["Check the other frame."],
+        })}}]}
+        with patch.dict(os.environ, {model.api_key_env: "test-credential"}), \
+                patch.object(semantic_agent, "urlopen", return_value=io.BytesIO(json.dumps(completion).encode())) as send:
+            state = self.run_dataset(config)
+            send.assert_called_once()
+            updated = self.resume_dataset(state)
+            send.assert_called_once()
+
+        self.assertEqual(set(outputs(state, "semantics")), {"stack.tif"})
+        saved = profile(state, "stack.tif")
+        self.assertEqual(saved["kind"], "tiff")
+        image, = saved["images"]
+        self.assertEqual((image["frame_number"], image["frame_count"]), (1, 2))
+        request = send.call_args.args[0]
+        self.assertEqual(request.full_url, model.endpoint)
+        body = json.loads(request.data)
+        self.assertEqual(body["model"], "qwen3")
+        text, visual = body["messages"][0]["content"]
+        self.assertIn('"frame_count": 2', text["text"])
+        prefix, encoded = visual["image_url"]["url"].split(",", 1)
+        self.assertEqual(prefix, "data:image/png;base64")
+        preview = base64.b64decode(encoded, validate=True)
+        self.assertEqual(preview, (state.run_dir / image["preview_path"]).read_bytes())
+        with Image.open(io.BytesIO(preview)) as decoded:
+            self.assertEqual(decoded.getpixel((0, 0)), (255, 0, 0))
+        self.assertEqual(image["model_interpretation"]["status"], "complete")
+        self.assertEqual(updated.checkpoint["model_requests_used"], 1)
+        self.assertEqual(outputs(updated, "semantics"), outputs(state, "semantics"))
+        report = report_path(state).read_text()
+        self.assertIn("frame 1 of 2 PNG preview", report)
+        self.assertIn("Vision model interpretation (qwen3)", report)
+        self.assertIn("A red preview.", report)
+
+        with patch.dict(os.environ, {model.api_key_env: "test-credential"}), \
+                patch.object(semantic_agent, "request_completion", return_value='{"description": []}') as send:
+            failed = self.run_dataset(config)
+            disabled = self.run_dataset(self.config)
+            send.assert_called_once()
+        for run, status in ((failed, "failed"), (disabled, "disabled")):
+            image, = profile(run, "stack.tif")["images"]
+            self.assertTrue((run.run_dir / image["preview_path"]).is_file())
+            self.assertEqual(image["model_interpretation"]["status"], status)
+        self.assertEqual(disabled.checkpoint["model_requests_used"], 0)

@@ -52,6 +52,14 @@ The report labels model descriptions and hypotheses alongside the cited
 dictionary findings. For an offline run, pass `--no-model` or set
 `interpret_semantics = false` in the model settings.
 
+## TIFF interpretation
+
+With model calls enabled and credentials available, TIFF inputs go through the
+image profiler and then a vision model. The request carries the saved PNG
+preview of the first frame, using `qwen3` by default. The semantic profile and
+report link to the preview and record its frame number and the total frame
+count. TIFF and table interpretation share the run's model request budget.
+
 **macOS: `ModuleNotFoundError: No module named 'agents'` from `d37-agent`.**
 macOS sometimes marks the files in `.venv` as hidden, and Python 3.12 or newer
 skips hidden `.pth` files, which breaks the editable install. To fix it, run
@@ -82,6 +90,7 @@ analysis_memory_mb = 1024
 [model]
 endpoint = "https://ellm.nrp-nautilus.io/v1/chat/completions"
 name = "gpt-oss"
+vision_name = "qwen3"         # interprets TIFF previews on the same endpoint
 api_key_env = "NRP_KEY"       # the name of the environment variable, never the key
 interpret_semantics = true   # request model descriptions and hypotheses
 

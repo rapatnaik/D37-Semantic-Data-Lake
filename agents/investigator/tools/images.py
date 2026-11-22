@@ -245,7 +245,8 @@ def _inspect(source: SourceRef, context: Any) -> ToolResult:
             hist_rel = f"histograms/{token}.png"
             preview.save(_output_path(context, preview_rel))
             _plot_histogram(samples, bands, _output_path(context, hist_rel))
-            artifacts = [ArtifactRef(f"preview_{token}", preview_rel, "image/png"),
+            info["preview_artifact_id"] = f"preview_{token}"
+            artifacts = [ArtifactRef(info["preview_artifact_id"], preview_rel, "image/png"),
                          ArtifactRef(f"histogram_{token}", hist_rel, "image/png")]
             # For multipage images, total pixels over frames may be unknown.
             total = (width * height if frames == 1 else None)

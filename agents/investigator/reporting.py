@@ -187,6 +187,29 @@ def _table_semantics(profile: dict, documents: dict[str, str]) -> list[str]:
     return lines
 
 
+def _tiff_semantics(profile: dict) -> list[str]:
+    lines = []
+    for image in profile["images"]:
+        lines.extend([f"#### TIFF interpretation for {_literal(image['source_path'])}", ""])
+        if preview := image["preview_path"]:
+            total = image["frame_count"]
+            frame = f"frame {image['frame_number']}" + (f" of {total}" if total is not None else "")
+            lines.extend([f"Image evidence [{frame} PNG preview](../../{quote(preview)}).", ""])
+        model = image["model_interpretation"]
+        if model["status"] == "complete":
+            lines.extend([f"**Vision model interpretation ({_literal(model['model'])})**",
+                          "", _literal(model["description"]), ""])
+            for hypothesis in model["needs_verification"]:
+                lines.append(f"- **Needs verification** {_literal(hypothesis)}")
+            if model["needs_verification"]:
+                lines.append("")
+        elif model["status"] == "disabled":
+            lines.extend(["Vision model interpretation disabled.", ""])
+        else:
+            lines.extend([f"Vision model interpretation {model['status']}. {_literal(model['reason'])}", ""])
+    return lines
+
+
 def _markdown(data: dict[str, Any]) -> str:
     inventory = data["inventory"]
     sources = {s["source_id"]: s["relative_path"] for s in inventory["sources"]}
@@ -219,7 +242,11 @@ def _markdown(data: dict[str, Any]) -> str:
         if cid in data["metadata"]:
             lines += ["**Assembled metadata (not independently remeasured):**", "", _json_block(data["metadata"][cid]), ""]
         if cid in data["semantics"]:
-            lines += _table_semantics(data["semantics"][cid], data["document_artifacts"])
+            profile = data["semantics"][cid]
+            if profile.get("kind") == "tiff":
+                lines += _tiff_semantics(profile)
+            else:
+                lines += _table_semantics(profile, data["document_artifacts"])
         if result["limitations"]:
             lines += ["**Limitations and uncertainty:**", ""]
             lines += [f"- {_cell(x)}" for x in result["limitations"]]

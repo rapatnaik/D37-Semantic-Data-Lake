@@ -41,6 +41,7 @@ from .state import RunState, Stopwatch, write_text_atomic
 ProgressFn = Callable[[dict[str, Any]], None]
 TERMINAL = {"done", "removed"}
 DEFAULT_SEMANTICS = "agents.investigator.semantics:build_semantic_profile"
+TIFF_SEMANTICS = "agents.investigator.image_semantics:build_tiff_profile"
 EVIDENCE_KINDS = {"tool", "metadata"}
 INTERPRETATION_KINDS = {"semantics", "report"}
 
@@ -587,10 +588,12 @@ class Scheduler:
         from .semantics import resolve_dictionaries
 
         jobs = self._jobs()
-        tables, documents = {}, []
+        tables, tiffs, documents = {}, {}, []
         for cid, component in self.components.items():
             if component.kind == "table":
                 tables[cid] = self._component_metadata(cid)
+            elif component.kind == "images" and any(source.format == "tiff" for source in self._component_sources(component)):
+                tiffs[cid] = self._component_metadata(cid)
             elif component.kind == "documents":
                 result = self._latest_result(f"tool-{_short(cid)}")
                 if result is not None:
@@ -598,19 +601,25 @@ class Scheduler:
         self.semantic_evidence, issues = resolve_dictionaries(self.inventory, tables, documents)
         self.state.checkpoint["dictionary_reference_issues"] = issues
         sem_hash = code_hash(self.stages.semantics)
-        model_fingerprint = None
+        tiff_hash = code_hash(TIFF_SEMANTICS) if tiffs else None
+        model_fingerprint = vision_fingerprint = None
         settings = self.config.model
         if settings.enabled and settings.interpret_semantics:
-            model_fingerprint = _digest([asdict(settings), self.config.api_key() is not None,
-                                         self.config.limits.model_requests_per_run,
-                                         code_hash("agents.semantic_agent:build_table_prompt")])
+            table_settings = asdict(settings)
+            vision_name = table_settings.pop("vision_name")
+            shared = [self.config.api_key() is not None, self.config.limits.model_requests_per_run,
+                      code_hash("agents.semantic_agent:request_completion")]
+            model_fingerprint = _digest([table_settings, *shared])
+            vision_fingerprint = _digest([{**table_settings, "name": vision_name}, *shared])
 
         planned = {}
-        for order, cid in enumerate(tables):
+        for order, (cid, metadata) in enumerate({**tables, **tiffs}.items()):
             short = _short(cid)
-            evidence = _digest([tables[cid], self.semantic_evidence[cid], sem_hash,
+            is_tiff = cid in tiffs
+            evidence = _digest([metadata, self.semantic_evidence.get(cid), tiff_hash if is_tiff else sem_hash,
                                 jobs[f"tool-{short}"]["outputs"].get("result")])
-            enrichment = _digest([evidence, model_fingerprint]) if model_fingerprint else None
+            model = vision_fingerprint if is_tiff else model_fingerprint
+            enrichment = _digest([evidence, model]) if model else None
             planned[f"sem-{short}"] = {
                 "kind": "semantics", "order": order, "component_id": cid, "deps": [f"meta-{short}"],
                 "enrichment_fingerprint": enrichment, "fingerprint": _digest([evidence, enrichment]),
@@ -646,19 +655,26 @@ class Scheduler:
         job = self._jobs()[job_id]
         cid = job["component_id"]
         metadata = self._component_metadata(cid)
-        build_profile = load_callable(self.stages.semantics)
-        if self.builtin_semantics:
+        component = self.components[cid]
+        if self.builtin_semantics and component.kind == "images":
+            profile = load_callable(TIFF_SEMANTICS)(
+                metadata, sources=self._component_sources(component), run_dir=self.state.run_dir,
+                budget=self.budget, config=self.config,
+            )
+        elif self.builtin_semantics:
             tool = self._jobs()[f"tool-{_short(cid)}"]
-            source = self._component_sources(self.components[cid])[0]
-            profile = build_profile(metadata, source=source, result_path=tool["outputs"].get("result"),
-                                    dictionary=self.semantic_evidence[cid], budget=self.budget, config=self.config)
+            source = self._component_sources(component)[0]
+            profile = load_callable(self.stages.semantics)(
+                metadata, source=source, result_path=tool["outputs"].get("result"),
+                dictionary=self.semantic_evidence[cid], budget=self.budget, config=self.config,
+            )
         else:
             if self.config.api_key() is None:
                 self._finish_job(job_id, {}, result_status="skipped",
                                  error=f"No model credentials in ${self.config.model.api_key_env}")
                 return
             try:
-                profile = build_profile(metadata, budget=self.budget, config=self.config)
+                profile = load_callable(self.stages.semantics)(metadata, budget=self.budget, config=self.config)
             except BudgetExhausted as error:
                 self._finish_job(job_id, {}, result_status="skipped", error=str(error))
                 return

@@ -45,7 +45,8 @@ def interpret_column(profile, column_name, model="gpt-oss"):
     return request_completion(build_column_prompt(profile, column_name), model)
 
 
-def request_completion(prompt, model, *, endpoint=DEFAULT_ENDPOINT, api_key=None):
+def request_completion(prompt: str | list[dict], model, *, endpoint=DEFAULT_ENDPOINT, api_key=None):
+    """Request a reply for text or Chat Completions content parts."""
     token = os.environ.get("NRP_KEY") if api_key is None else api_key
     if not token:
         raise ValueError("Set NRP_KEY to your NRP LLM API key.")
@@ -83,11 +84,15 @@ def build_table_prompt(profile):
     )
 
 
-def parse_columns(reply, expected):
+def parse_json_reply(reply):
     text = reply.strip()
     if text.startswith("```"):
         text = text.partition("\n")[2].removesuffix("```").strip()
-    columns = json.loads(text)
+    return json.loads(text)
+
+
+def parse_columns(reply, expected):
+    columns = parse_json_reply(reply)
     if not isinstance(columns, dict) or columns.keys() != expected.keys():
         raise ValueError("Model reply must include exactly the input columns.")
     for name, entry in columns.items():
