@@ -1,0 +1,24 @@
+{"run_id": "20261122T171856Z-53fa6c", "time": "2026-11-22T17:18:56.367Z", "type": "run_created"}
+{"added": 2, "changed": 0, "components": 2, "removed": 0, "sources": 2, "time": "2026-11-22T17:18:56.370Z", "type": "discovery_completed"}
+{"relative_path": "Cardiovascular_Disease_Dataset.csv", "time": "2026-11-22T17:18:56.370Z", "type": "source_added"}
+{"relative_path": "heart_disease.csv", "time": "2026-11-22T17:18:56.370Z", "type": "source_added"}
+{"invalidated": 0, "new": 4, "removed": 0, "retry": 0, "reused": 0, "time": "2026-11-22T17:18:56.371Z", "type": "plan_reconciled"}
+{"pending": 4, "time": "2026-11-22T17:18:56.371Z", "total": 4, "type": "schedule_started", "workers": 4}
+{"component_id": "component_6820cb4505cf327a65423a24d654640e66096b48f9291af74bdb0156372f31af", "job_id": "tool-48a0c8021069bc54", "kind": "tool", "time": "2026-11-22T17:18:56.377Z", "tool": "agents.investigator.tools.tables:profile_table", "type": "job_started"}
+{"component_id": "component_ac2c19784483e689c5a5d136a6a334511466a5d1495a7d5b614d266e4ca2ce4c", "job_id": "tool-78a58871dee88408", "kind": "tool", "time": "2026-11-22T17:18:56.379Z", "tool": "agents.investigator.tools.tables:profile_table", "type": "job_started"}
+{"component_id": "component_ac2c19784483e689c5a5d136a6a334511466a5d1495a7d5b614d266e4ca2ce4c", "job_id": "tool-78a58871dee88408", "kind": "tool", "result_status": "complete", "time": "2026-11-22T17:18:57.374Z", "type": "job_completed"}
+{"component_id": "component_ac2c19784483e689c5a5d136a6a334511466a5d1495a7d5b614d266e4ca2ce4c", "job_id": "meta-78a58871dee88408", "kind": "metadata", "time": "2026-11-22T17:18:57.374Z", "type": "job_started"}
+{"component_id": "component_ac2c19784483e689c5a5d136a6a334511466a5d1495a7d5b614d266e4ca2ce4c", "job_id": "meta-78a58871dee88408", "kind": "metadata", "result_status": "complete", "time": "2026-11-22T17:18:57.376Z", "type": "job_completed"}
+{"component_id": "component_6820cb4505cf327a65423a24d654640e66096b48f9291af74bdb0156372f31af", "job_id": "tool-48a0c8021069bc54", "kind": "tool", "result_status": "complete", "time": "2026-11-22T17:18:57.400Z", "type": "job_completed"}
+{"component_id": "component_6820cb4505cf327a65423a24d654640e66096b48f9291af74bdb0156372f31af", "job_id": "meta-48a0c8021069bc54", "kind": "metadata", "time": "2026-11-22T17:18:57.400Z", "type": "job_started"}
+{"component_id": "component_6820cb4505cf327a65423a24d654640e66096b48f9291af74bdb0156372f31af", "job_id": "meta-48a0c8021069bc54", "kind": "metadata", "result_status": "complete", "time": "2026-11-22T17:18:57.403Z", "type": "job_completed"}
+{"invalidated": 0, "new": 3, "removed": 0, "retry": 0, "reused": 0, "time": "2026-11-22T17:18:57.412Z", "type": "semantic_plan_reconciled"}
+{"pending": 3, "time": "2026-11-22T17:18:57.412Z", "total": 7, "type": "schedule_started", "workers": 4}
+{"component_id": "component_6820cb4505cf327a65423a24d654640e66096b48f9291af74bdb0156372f31af", "job_id": "sem-48a0c8021069bc54", "kind": "semantics", "time": "2026-11-22T17:18:57.412Z", "type": "job_started"}
+{"component_id": "component_6820cb4505cf327a65423a24d654640e66096b48f9291af74bdb0156372f31af", "job_id": "sem-48a0c8021069bc54", "kind": "semantics", "result_status": "complete", "time": "2026-11-22T17:20:57.506Z", "type": "job_completed"}
+{"component_id": "component_ac2c19784483e689c5a5d136a6a334511466a5d1495a7d5b614d266e4ca2ce4c", "job_id": "sem-78a58871dee88408", "kind": "semantics", "time": "2026-11-22T17:20:57.507Z", "type": "job_started"}
+{"component_id": "component_ac2c19784483e689c5a5d136a6a334511466a5d1495a7d5b614d266e4ca2ce4c", "job_id": "sem-78a58871dee88408", "kind": "semantics", "result_status": "complete", "time": "2026-11-22T17:22:57.551Z", "type": "job_completed"}
+{"component_id": null, "job_id": "report", "kind": "report", "time": "2026-11-22T17:22:57.551Z", "type": "job_started"}
+{"component_id": null, "job_id": "report", "kind": "report", "result_status": "complete", "time": "2026-11-22T17:22:57.582Z", "type": "job_completed"}
+{"revision": "reports/revision-001", "time": "2026-11-22T17:22:57.582Z", "type": "report_written"}
+{"elapsed_seconds": 241.21, "status": "completed", "time": "2026-11-22T17:22:57.582Z", "type": "schedule_finished"}

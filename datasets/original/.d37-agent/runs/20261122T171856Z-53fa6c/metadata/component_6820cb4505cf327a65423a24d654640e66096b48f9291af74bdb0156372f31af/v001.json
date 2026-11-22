@@ -1,0 +1,420 @@
+{
+  "schema_version": "1.0",
+  "component_id": "component_6820cb4505cf327a65423a24d654640e66096b48f9291af74bdb0156372f31af",
+  "result_count": 1,
+  "source_ids": [
+    "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8"
+  ],
+  "results": [
+    {
+      "result_id": "r-tool-48a0c8021069bc54",
+      "component_id": "component_6820cb4505cf327a65423a24d654640e66096b48f9291af74bdb0156372f31af",
+      "status": "complete",
+      "inputs": [
+        "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8"
+      ],
+      "method": "table_profile_v2",
+      "parameters": {
+        "max_source_bytes": 26214400,
+        "format": "csv",
+        "sampling": "none"
+      },
+      "coverage": {
+        "mode": "full",
+        "unit": "rows",
+        "examined": 1000,
+        "total": 1000,
+        "selection": "All data rows",
+        "seed": null
+      },
+      "measurements": {
+        "row_count": 1000,
+        "column_count": 14,
+        "duplicate_row_count": 0,
+        "columns": {
+          "patientid": {
+            "dtype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 1000,
+            "candidate_key": true,
+            "min": 103368.0,
+            "max": 9990855.0,
+            "mean": 5048704.412,
+            "median": 4952508.5,
+            "std": 2895904.5004878514,
+            "value_frequencies": {
+              "values": [],
+              "sampled": false,
+              "truncated": true,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          },
+          "age": {
+            "dtype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 61,
+            "candidate_key": false,
+            "min": 20.0,
+            "max": 80.0,
+            "mean": 49.242,
+            "median": 49.0,
+            "std": 17.864730185048543,
+            "value_frequencies": {
+              "values": [],
+              "sampled": false,
+              "truncated": true,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          },
+          "gender": {
+            "dtype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 2,
+            "candidate_key": false,
+            "min": 0.0,
+            "max": 1.0,
+            "mean": 0.765,
+            "median": 1.0,
+            "std": 0.4242109792956271,
+            "value_frequencies": {
+              "values": [
+                {
+                  "value": 1,
+                  "count": 765
+                },
+                {
+                  "value": 0,
+                  "count": 235
+                }
+              ],
+              "sampled": false,
+              "truncated": false,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          },
+          "chestpain": {
+            "dtype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 4,
+            "candidate_key": false,
+            "min": 0.0,
+            "max": 3.0,
+            "mean": 0.98,
+            "median": 1.0,
+            "std": 0.9531571268728511,
+            "value_frequencies": {
+              "values": [
+                {
+                  "value": 0,
+                  "count": 420
+                },
+                {
+                  "value": 2,
+                  "count": 312
+                },
+                {
+                  "value": 1,
+                  "count": 224
+                },
+                {
+                  "value": 3,
+                  "count": 44
+                }
+              ],
+              "sampled": false,
+              "truncated": false,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          },
+          "restingBP": {
+            "dtype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 95,
+            "candidate_key": false,
+            "min": 94.0,
+            "max": 200.0,
+            "mean": 151.747,
+            "median": 147.0,
+            "std": 29.965228280557213,
+            "value_frequencies": {
+              "values": [],
+              "sampled": false,
+              "truncated": true,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          },
+          "serumcholestrol": {
+            "dtype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 344,
+            "candidate_key": false,
+            "min": 0.0,
+            "max": 602.0,
+            "mean": 311.447,
+            "median": 318.0,
+            "std": 132.44380148406927,
+            "value_frequencies": {
+              "values": [],
+              "sampled": false,
+              "truncated": true,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          },
+          "fastingbloodsugar": {
+            "dtype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 2,
+            "candidate_key": false,
+            "min": 0.0,
+            "max": 1.0,
+            "mean": 0.296,
+            "median": 0.0,
+            "std": 0.45671938057476014,
+            "value_frequencies": {
+              "values": [
+                {
+                  "value": 0,
+                  "count": 704
+                },
+                {
+                  "value": 1,
+                  "count": 296
+                }
+              ],
+              "sampled": false,
+              "truncated": false,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          },
+          "restingrelectro": {
+            "dtype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 3,
+            "candidate_key": false,
+            "min": 0.0,
+            "max": 2.0,
+            "mean": 0.748,
+            "median": 1.0,
+            "std": 0.7701227753346146,
+            "value_frequencies": {
+              "values": [
+                {
+                  "value": 0,
+                  "count": 454
+                },
+                {
+                  "value": 1,
+                  "count": 344
+                },
+                {
+                  "value": 2,
+                  "count": 202
+                }
+              ],
+              "sampled": false,
+              "truncated": false,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          },
+          "maxheartrate": {
+            "dtype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 129,
+            "candidate_key": false,
+            "min": 71.0,
+            "max": 202.0,
+            "mean": 145.477,
+            "median": 146.0,
+            "std": 34.190268285660544,
+            "value_frequencies": {
+              "values": [],
+              "sampled": false,
+              "truncated": true,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          },
+          "exerciseangia": {
+            "dtype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 2,
+            "candidate_key": false,
+            "min": 0.0,
+            "max": 1.0,
+            "mean": 0.498,
+            "median": 0.0,
+            "std": 0.5002461856388775,
+            "value_frequencies": {
+              "values": [
+                {
+                  "value": 0,
+                  "count": 502
+                },
+                {
+                  "value": 1,
+                  "count": 498
+                }
+              ],
+              "sampled": false,
+              "truncated": false,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          },
+          "oldpeak": {
+            "dtype": "float64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 63,
+            "candidate_key": false,
+            "min": 0.0,
+            "max": 6.2,
+            "mean": 2.7077,
+            "median": 2.4,
+            "std": 1.720753236725621,
+            "value_frequencies": {
+              "values": [],
+              "sampled": false,
+              "truncated": true,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          },
+          "slope": {
+            "dtype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 4,
+            "candidate_key": false,
+            "min": 0.0,
+            "max": 3.0,
+            "mean": 1.54,
+            "median": 2.0,
+            "std": 1.0036968702787747,
+            "value_frequencies": {
+              "values": [
+                {
+                  "value": 2,
+                  "count": 322
+                },
+                {
+                  "value": 1,
+                  "count": 299
+                },
+                {
+                  "value": 3,
+                  "count": 199
+                },
+                {
+                  "value": 0,
+                  "count": 180
+                }
+              ],
+              "sampled": false,
+              "truncated": false,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          },
+          "noofmajorvessels": {
+            "dtype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 4,
+            "candidate_key": false,
+            "min": 0.0,
+            "max": 3.0,
+            "mean": 1.222,
+            "median": 1.0,
+            "std": 0.9775846110039129,
+            "value_frequencies": {
+              "values": [
+                {
+                  "value": 1,
+                  "count": 344
+                },
+                {
+                  "value": 0,
+                  "count": 275
+                },
+                {
+                  "value": 2,
+                  "count": 265
+                },
+                {
+                  "value": 3,
+                  "count": 116
+                }
+              ],
+              "sampled": false,
+              "truncated": false,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          },
+          "target": {
+            "dtype": "int64",
+            "null_count": 0,
+            "null_percentage": 0.0,
+            "distinct_count": 2,
+            "candidate_key": false,
+            "min": 0.0,
+            "max": 1.0,
+            "mean": 0.58,
+            "median": 1.0,
+            "std": 0.49380547166252003,
+            "value_frequencies": {
+              "values": [
+                {
+                  "value": 1,
+                  "count": 580
+                },
+                {
+                  "value": 0,
+                  "count": 420
+                }
+              ],
+              "sampled": false,
+              "truncated": false,
+              "max_distinct": 20,
+              "numeric": true
+            }
+          }
+        },
+        "profile_scope": "full"
+      },
+      "artifacts": [
+        {
+          "artifact_id": "table_plot_e6c0e478a627c9cd_0",
+          "relative_path": "artifacts/tool-48a0c8021069bc54/attempt-001/tables/e6c0e478a627c9cd/profile/missing_values.png",
+          "media_type": "image/png"
+        },
+        {
+          "artifact_id": "table_plot_e6c0e478a627c9cd_1",
+          "relative_path": "artifacts/tool-48a0c8021069bc54/attempt-001/tables/e6c0e478a627c9cd/profile/numeric_distributions.png",
+          "media_type": "image/png"
+        }
+      ],
+      "limitations": [],
+      "schema_version": "1.0"
+    }
+  ]
+}

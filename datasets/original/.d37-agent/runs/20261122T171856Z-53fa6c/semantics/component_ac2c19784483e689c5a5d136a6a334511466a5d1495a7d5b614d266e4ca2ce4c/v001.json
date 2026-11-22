@@ -1,0 +1,475 @@
+{
+  "schema_version": "1.0",
+  "component_id": "component_ac2c19784483e689c5a5d136a6a334511466a5d1495a7d5b614d266e4ca2ce4c",
+  "observation": {
+    "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+    "source_path": "heart_disease.csv",
+    "result_id": "r-tool-78a58871dee88408",
+    "result_path": "results/tool-78a58871dee88408/v001.json"
+  },
+  "coverage": {
+    "mode": "full",
+    "unit": "rows",
+    "examined": 303,
+    "total": 303,
+    "selection": "All data rows",
+    "seed": null
+  },
+  "columns": {
+    "sex": {
+      "column": "sex",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 2,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+        "source_path": "heart_disease.csv",
+        "result_id": "r-tool-78a58871dee88408",
+        "result_path": "results/tool-78a58871dee88408/v001.json",
+        "locator": "column sex"
+      },
+      "values": [
+        {
+          "value": 1,
+          "count": 206,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 0,
+          "count": 97,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "cp": {
+      "column": "cp",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 4,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+        "source_path": "heart_disease.csv",
+        "result_id": "r-tool-78a58871dee88408",
+        "result_path": "results/tool-78a58871dee88408/v001.json",
+        "locator": "column cp"
+      },
+      "values": [
+        {
+          "value": 4,
+          "count": 144,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 3,
+          "count": 86,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 2,
+          "count": 50,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 1,
+          "count": 23,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "fbs": {
+      "column": "fbs",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 2,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+        "source_path": "heart_disease.csv",
+        "result_id": "r-tool-78a58871dee88408",
+        "result_path": "results/tool-78a58871dee88408/v001.json",
+        "locator": "column fbs"
+      },
+      "values": [
+        {
+          "value": 0,
+          "count": 258,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 1,
+          "count": 45,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "restecg": {
+      "column": "restecg",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 3,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+        "source_path": "heart_disease.csv",
+        "result_id": "r-tool-78a58871dee88408",
+        "result_path": "results/tool-78a58871dee88408/v001.json",
+        "locator": "column restecg"
+      },
+      "values": [
+        {
+          "value": 0,
+          "count": 151,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 2,
+          "count": 148,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 1,
+          "count": 4,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "exang": {
+      "column": "exang",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 2,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+        "source_path": "heart_disease.csv",
+        "result_id": "r-tool-78a58871dee88408",
+        "result_path": "results/tool-78a58871dee88408/v001.json",
+        "locator": "column exang"
+      },
+      "values": [
+        {
+          "value": 0,
+          "count": 204,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 1,
+          "count": 99,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "slope": {
+      "column": "slope",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 3,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+        "source_path": "heart_disease.csv",
+        "result_id": "r-tool-78a58871dee88408",
+        "result_path": "results/tool-78a58871dee88408/v001.json",
+        "locator": "column slope"
+      },
+      "values": [
+        {
+          "value": 1,
+          "count": 142,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 2,
+          "count": 140,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 3,
+          "count": 21,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "ca": {
+      "column": "ca",
+      "dtype": "float64",
+      "null_count": 4,
+      "distinct_count": 4,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+        "source_path": "heart_disease.csv",
+        "result_id": "r-tool-78a58871dee88408",
+        "result_path": "results/tool-78a58871dee88408/v001.json",
+        "locator": "column ca"
+      },
+      "values": [
+        {
+          "value": 0.0,
+          "count": 176,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 1.0,
+          "count": 65,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 2.0,
+          "count": 38,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 3.0,
+          "count": 20,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "thal": {
+      "column": "thal",
+      "dtype": "float64",
+      "null_count": 2,
+      "distinct_count": 3,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+        "source_path": "heart_disease.csv",
+        "result_id": "r-tool-78a58871dee88408",
+        "result_path": "results/tool-78a58871dee88408/v001.json",
+        "locator": "column thal"
+      },
+      "values": [
+        {
+          "value": 3.0,
+          "count": 166,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 7.0,
+          "count": 117,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 6.0,
+          "count": 18,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "num": {
+      "column": "num",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 5,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+        "source_path": "heart_disease.csv",
+        "result_id": "r-tool-78a58871dee88408",
+        "result_path": "results/tool-78a58871dee88408/v001.json",
+        "locator": "column num"
+      },
+      "values": [
+        {
+          "value": 0,
+          "count": 164,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 1,
+          "count": 55,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 2,
+          "count": 36,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 3,
+          "count": 35,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 4,
+          "count": 13,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    }
+  },
+  "dictionary_entries": [],
+  "dictionary_coverage_limitations": [],
+  "needs_verification": [
+    {
+      "reason": "no_linked_dictionary",
+      "column": "sex",
+      "citations": [
+        {
+          "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+          "source_path": "heart_disease.csv",
+          "result_id": "r-tool-78a58871dee88408",
+          "result_path": "results/tool-78a58871dee88408/v001.json",
+          "locator": "column sex"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "cp",
+      "citations": [
+        {
+          "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+          "source_path": "heart_disease.csv",
+          "result_id": "r-tool-78a58871dee88408",
+          "result_path": "results/tool-78a58871dee88408/v001.json",
+          "locator": "column cp"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "fbs",
+      "citations": [
+        {
+          "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+          "source_path": "heart_disease.csv",
+          "result_id": "r-tool-78a58871dee88408",
+          "result_path": "results/tool-78a58871dee88408/v001.json",
+          "locator": "column fbs"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "restecg",
+      "citations": [
+        {
+          "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+          "source_path": "heart_disease.csv",
+          "result_id": "r-tool-78a58871dee88408",
+          "result_path": "results/tool-78a58871dee88408/v001.json",
+          "locator": "column restecg"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "exang",
+      "citations": [
+        {
+          "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+          "source_path": "heart_disease.csv",
+          "result_id": "r-tool-78a58871dee88408",
+          "result_path": "results/tool-78a58871dee88408/v001.json",
+          "locator": "column exang"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "slope",
+      "citations": [
+        {
+          "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+          "source_path": "heart_disease.csv",
+          "result_id": "r-tool-78a58871dee88408",
+          "result_path": "results/tool-78a58871dee88408/v001.json",
+          "locator": "column slope"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "ca",
+      "citations": [
+        {
+          "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+          "source_path": "heart_disease.csv",
+          "result_id": "r-tool-78a58871dee88408",
+          "result_path": "results/tool-78a58871dee88408/v001.json",
+          "locator": "column ca"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "thal",
+      "citations": [
+        {
+          "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+          "source_path": "heart_disease.csv",
+          "result_id": "r-tool-78a58871dee88408",
+          "result_path": "results/tool-78a58871dee88408/v001.json",
+          "locator": "column thal"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "num",
+      "citations": [
+        {
+          "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+          "source_path": "heart_disease.csv",
+          "result_id": "r-tool-78a58871dee88408",
+          "result_path": "results/tool-78a58871dee88408/v001.json",
+          "locator": "column num"
+        }
+      ]
+    }
+  ],
+  "model_interpretation": {
+    "status": "failed",
+    "reason": "Model interpretation failed (TimeoutError)."
+  }
+}

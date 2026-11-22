@@ -1,0 +1,48 @@
+{
+  "sources": [
+    {
+      "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+      "relative_path": "Cardiovascular_Disease_Dataset.csv",
+      "format": "csv",
+      "size_bytes": 43633,
+      "mtime_ns": 1793780875271709331,
+      "sha256": "9376367dde41e79e432d6402ea5d9e44223fc318ff54ed09966d721923947d1e"
+    },
+    {
+      "source_id": "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce",
+      "relative_path": "heart_disease.csv",
+      "format": "csv",
+      "size_bytes": 13585,
+      "mtime_ns": 1793780875271929712,
+      "sha256": "deac608b5e87af987b4fb29f8066b50edfbfed8b70a83251ae4cdc3f1ea13438"
+    }
+  ],
+  "components": [
+    {
+      "component_id": "component_6820cb4505cf327a65423a24d654640e66096b48f9291af74bdb0156372f31af",
+      "kind": "table",
+      "source_ids": [
+        "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8"
+      ],
+      "selector": {}
+    },
+    {
+      "component_id": "component_ac2c19784483e689c5a5d136a6a334511466a5d1495a7d5b614d266e4ca2ce4c",
+      "kind": "table",
+      "source_ids": [
+        "source_1ef6549ed7bef167e124f057ee14ebb4650b72aaaef58aeafdc3a703787113ce"
+      ],
+      "selector": {}
+    }
+  ],
+  "limitations": [
+    "Discovery is read-only but is not a complete sandbox against concurrent filesystem changes.",
+    "Discovery uses file signatures, extensions, and bounded prefix reads; parsing is handled by downstream tools.",
+    "Filename exclusions cannot detect arbitrary secrets stored inside otherwise eligible files.",
+    "Format labels are candidates, not validated file contents.",
+    "Hidden entries, common credential names, caches, generated output directories, and symlinks are excluded.",
+    "No Excel sheets, image pixels, document contents, or collection associations are inspected.",
+    "ZIP-based Office formats are identified by internal filenames, not by validating workbook or document content."
+  ],
+  "schema_version": "1.0"
+}

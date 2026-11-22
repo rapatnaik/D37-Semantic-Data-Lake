@@ -1,0 +1,414 @@
+{
+  "schema_version": "1.0",
+  "component_id": "component_6820cb4505cf327a65423a24d654640e66096b48f9291af74bdb0156372f31af",
+  "observation": {
+    "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+    "source_path": "Cardiovascular_Disease_Dataset.csv",
+    "result_id": "r-tool-48a0c8021069bc54",
+    "result_path": "results/tool-48a0c8021069bc54/v001.json"
+  },
+  "coverage": {
+    "mode": "full",
+    "unit": "rows",
+    "examined": 1000,
+    "total": 1000,
+    "selection": "All data rows",
+    "seed": null
+  },
+  "columns": {
+    "gender": {
+      "column": "gender",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 2,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+        "source_path": "Cardiovascular_Disease_Dataset.csv",
+        "result_id": "r-tool-48a0c8021069bc54",
+        "result_path": "results/tool-48a0c8021069bc54/v001.json",
+        "locator": "column gender"
+      },
+      "values": [
+        {
+          "value": 1,
+          "count": 765,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 0,
+          "count": 235,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "chestpain": {
+      "column": "chestpain",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 4,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+        "source_path": "Cardiovascular_Disease_Dataset.csv",
+        "result_id": "r-tool-48a0c8021069bc54",
+        "result_path": "results/tool-48a0c8021069bc54/v001.json",
+        "locator": "column chestpain"
+      },
+      "values": [
+        {
+          "value": 0,
+          "count": 420,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 2,
+          "count": 312,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 1,
+          "count": 224,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 3,
+          "count": 44,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "fastingbloodsugar": {
+      "column": "fastingbloodsugar",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 2,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+        "source_path": "Cardiovascular_Disease_Dataset.csv",
+        "result_id": "r-tool-48a0c8021069bc54",
+        "result_path": "results/tool-48a0c8021069bc54/v001.json",
+        "locator": "column fastingbloodsugar"
+      },
+      "values": [
+        {
+          "value": 0,
+          "count": 704,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 1,
+          "count": 296,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "restingrelectro": {
+      "column": "restingrelectro",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 3,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+        "source_path": "Cardiovascular_Disease_Dataset.csv",
+        "result_id": "r-tool-48a0c8021069bc54",
+        "result_path": "results/tool-48a0c8021069bc54/v001.json",
+        "locator": "column restingrelectro"
+      },
+      "values": [
+        {
+          "value": 0,
+          "count": 454,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 1,
+          "count": 344,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 2,
+          "count": 202,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "exerciseangia": {
+      "column": "exerciseangia",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 2,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+        "source_path": "Cardiovascular_Disease_Dataset.csv",
+        "result_id": "r-tool-48a0c8021069bc54",
+        "result_path": "results/tool-48a0c8021069bc54/v001.json",
+        "locator": "column exerciseangia"
+      },
+      "values": [
+        {
+          "value": 0,
+          "count": 502,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 1,
+          "count": 498,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "slope": {
+      "column": "slope",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 4,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+        "source_path": "Cardiovascular_Disease_Dataset.csv",
+        "result_id": "r-tool-48a0c8021069bc54",
+        "result_path": "results/tool-48a0c8021069bc54/v001.json",
+        "locator": "column slope"
+      },
+      "values": [
+        {
+          "value": 2,
+          "count": 322,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 1,
+          "count": 299,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 3,
+          "count": 199,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 0,
+          "count": 180,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "noofmajorvessels": {
+      "column": "noofmajorvessels",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 4,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+        "source_path": "Cardiovascular_Disease_Dataset.csv",
+        "result_id": "r-tool-48a0c8021069bc54",
+        "result_path": "results/tool-48a0c8021069bc54/v001.json",
+        "locator": "column noofmajorvessels"
+      },
+      "values": [
+        {
+          "value": 1,
+          "count": 344,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 0,
+          "count": 275,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 2,
+          "count": 265,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 3,
+          "count": 116,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    },
+    "target": {
+      "column": "target",
+      "dtype": "int64",
+      "null_count": 0,
+      "distinct_count": 2,
+      "sampled": false,
+      "truncated": false,
+      "max_distinct": 20,
+      "observation_citation": {
+        "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+        "source_path": "Cardiovascular_Disease_Dataset.csv",
+        "result_id": "r-tool-48a0c8021069bc54",
+        "result_path": "results/tool-48a0c8021069bc54/v001.json",
+        "locator": "column target"
+      },
+      "values": [
+        {
+          "value": 1,
+          "count": 580,
+          "status": "unresolved",
+          "definitions": []
+        },
+        {
+          "value": 0,
+          "count": 420,
+          "status": "unresolved",
+          "definitions": []
+        }
+      ]
+    }
+  },
+  "dictionary_entries": [],
+  "dictionary_coverage_limitations": [],
+  "needs_verification": [
+    {
+      "reason": "no_linked_dictionary",
+      "column": "gender",
+      "citations": [
+        {
+          "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+          "source_path": "Cardiovascular_Disease_Dataset.csv",
+          "result_id": "r-tool-48a0c8021069bc54",
+          "result_path": "results/tool-48a0c8021069bc54/v001.json",
+          "locator": "column gender"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "chestpain",
+      "citations": [
+        {
+          "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+          "source_path": "Cardiovascular_Disease_Dataset.csv",
+          "result_id": "r-tool-48a0c8021069bc54",
+          "result_path": "results/tool-48a0c8021069bc54/v001.json",
+          "locator": "column chestpain"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "fastingbloodsugar",
+      "citations": [
+        {
+          "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+          "source_path": "Cardiovascular_Disease_Dataset.csv",
+          "result_id": "r-tool-48a0c8021069bc54",
+          "result_path": "results/tool-48a0c8021069bc54/v001.json",
+          "locator": "column fastingbloodsugar"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "restingrelectro",
+      "citations": [
+        {
+          "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+          "source_path": "Cardiovascular_Disease_Dataset.csv",
+          "result_id": "r-tool-48a0c8021069bc54",
+          "result_path": "results/tool-48a0c8021069bc54/v001.json",
+          "locator": "column restingrelectro"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "exerciseangia",
+      "citations": [
+        {
+          "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+          "source_path": "Cardiovascular_Disease_Dataset.csv",
+          "result_id": "r-tool-48a0c8021069bc54",
+          "result_path": "results/tool-48a0c8021069bc54/v001.json",
+          "locator": "column exerciseangia"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "slope",
+      "citations": [
+        {
+          "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+          "source_path": "Cardiovascular_Disease_Dataset.csv",
+          "result_id": "r-tool-48a0c8021069bc54",
+          "result_path": "results/tool-48a0c8021069bc54/v001.json",
+          "locator": "column slope"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "noofmajorvessels",
+      "citations": [
+        {
+          "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+          "source_path": "Cardiovascular_Disease_Dataset.csv",
+          "result_id": "r-tool-48a0c8021069bc54",
+          "result_path": "results/tool-48a0c8021069bc54/v001.json",
+          "locator": "column noofmajorvessels"
+        }
+      ]
+    },
+    {
+      "reason": "no_linked_dictionary",
+      "column": "target",
+      "citations": [
+        {
+          "source_id": "source_95974f73a3179f4d052c001d94cb0a7fb6425852476ba4889fe384db9cec48e8",
+          "source_path": "Cardiovascular_Disease_Dataset.csv",
+          "result_id": "r-tool-48a0c8021069bc54",
+          "result_path": "results/tool-48a0c8021069bc54/v001.json",
+          "locator": "column target"
+        }
+      ]
+    }
+  ],
+  "model_interpretation": {
+    "status": "failed",
+    "reason": "Model interpretation failed (TimeoutError)."
+  }
+}
