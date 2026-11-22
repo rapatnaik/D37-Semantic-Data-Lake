@@ -46,10 +46,11 @@ six-row demo, copy `examples/status_dictionary_demo` to a temporary directory
 and run `d37-agent run` on the copy. Change `1 = pending` to `1 = active` in
 `dictionary_b.txt` and resume the same run to clear the conflict for code 1.
 
-Dictionary reconciliation runs offline. For optional model interpretations, use
-`d37-agent run --interpret-semantics DATA_DIR` or set
-`interpret_semantics = true` in the model settings. The report labels the model's
-descriptions and hypotheses separately from dictionary evidence.
+The semantic agent sends table metadata to the configured model by default
+when credentials are available, including for tables without dictionaries.
+The report labels model descriptions and hypotheses alongside the cited
+dictionary findings. For an offline run, pass `--no-model` or set
+`interpret_semantics = false` in the model settings.
 
 **macOS: `ModuleNotFoundError: No module named 'agents'` from `d37-agent`.**
 macOS sometimes marks the files in `.venv` as hidden, and Python 3.12 or newer
@@ -82,7 +83,7 @@ analysis_memory_mb = 1024
 endpoint = "https://ellm.nrp-nautilus.io/v1/chat/completions"
 name = "gpt-oss"
 api_key_env = "NRP_KEY"       # the name of the environment variable, never the key
-interpret_semantics = false  # opt in to model descriptions and hypotheses
+interpret_semantics = true   # request model descriptions and hypotheses
 
 [execution]
 backend = "docker"            # or "process" (development only, see below)

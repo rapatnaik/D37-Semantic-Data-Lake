@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
@@ -142,7 +143,8 @@ class SemanticStageTests(unittest.TestCase):
         temp = tempfile.TemporaryDirectory()
         self.addCleanup(temp.cleanup)
         self.data = Path(temp.name)
-        self.config = Config(execution=ExecutionSettings(backend="process", tool_isolation="inline"))
+        self.config = Config(model=ModelSettings(enabled=False),
+                             execution=ExecutionSettings(backend="process", tool_isolation="inline"))
         plots = patch.object(tables, "attach_table_plots", side_effect=lambda result, *_: result)
         plots.start()
         self.addCleanup(plots.stop)
@@ -289,19 +291,18 @@ class SemanticStageTests(unittest.TestCase):
         self.assertEqual(outputs(updated, "semantics"), outputs(reconciled, "semantics"))
         self.assertIn("| 1 | 1 | active", report_path(updated).read_text())
 
-    def test_model_optional_valid_malformed_missing_and_shared_budget(self):
+    def test_default_model_valid_malformed_missing_and_shared_budget(self):
         self.write("a.csv", "code\n1\n1\n")
         self.write("b.csv", "code\n1\n1\n")
-        self.write("dictionary.txt", "Table: a.csv\nColumn: code\n1 = active\n1 = pending\n"
-                   "Table: b.csv\nColumn: code\n1 = active\n1 = pending\n")
+        self.write("dictionary.txt", "Table: b.csv\nColumn: code\n1 = active\n1 = pending\n")
         reply = json.dumps({"code": {"description": "A status code", "semantic_type": "code", "unit": None,
                                      "evidence": [], "needs_verification": ["Verify encoding"], "count": 100}})
         model = ModelSettings(endpoint="https://model.example/v1/chat/completions", name="test-model",
-                              api_key_env="D37_TEST_SEMANTIC_KEY", interpret_semantics=True)
+                              api_key_env="D37_TEST_SEMANTIC_KEY")
         config = Config(model=model, limits=Limits(model_requests_per_run=1), execution=self.config.execution)
         with patch.object(semantic_agent, "request_completion", return_value=reply) as request:
             with patch.dict(os.environ, {model.api_key_env: "test-credential"}):
-                offline = self.run_dataset()
+                offline = self.run_dataset(replace(config, model=replace(model, enabled=False)))
                 request.assert_not_called()
                 enriched = self.run_dataset(config)
             request.assert_called_once()
@@ -334,5 +335,5 @@ class SemanticStageTests(unittest.TestCase):
                 actual = profile(state, name)
                 for field in ("columns", "needs_verification", "coverage"):
                     self.assertEqual(actual[field], deterministic[field])
-                self.assertEqual(rows(actual, "code")[1]["status"], "conflict")
+                self.assertEqual(rows(actual, "code")[1]["status"], "conflict" if name == "b.csv" else "unresolved")
                 self.assertEqual(rows(actual, "code")[1]["count"], 2)

@@ -256,7 +256,7 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--time-limit", type=int, help="seconds per invocation (default 900)")
     model = run.add_mutually_exclusive_group()
     model.add_argument("--no-model", action="store_true", help="skip model-backed stages")
-    model.add_argument("--interpret-semantics", action="store_true", help="request optional model interpretations")
+    model.add_argument("--interpret-semantics", action="store_true", help="enable model interpretations even if disabled in settings")
     run.add_argument("--no-hash", action="store_true", help="detect changes by size/mtime only")
     run.set_defaults(func=cmd_run)
 
