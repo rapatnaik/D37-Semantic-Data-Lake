@@ -2,14 +2,13 @@
 
 Job graph per run (one tool job per inventory component)::
 
-    tool-<c>  ->  meta-<c>  ->  sem-<c> (when a semantics stage exists)  ->  report
+    tools -> metadata -> resolve dictionary links -> table semantics -> report
 
 * Tool jobs are independent and run in parallel, up to ``limits.local_workers``,
   each in its own spawned process so a hung tool can be stopped.
-* Every job has a fingerprint built from its inputs' content keys (SHA-256 when
-  ``hash_inputs``), the code that runs it, and its parameters. Fingerprints chain
-  through dependencies, so a changed source re-runs its tool job, that
-  component's metadata and semantics, and the report; nothing else.
+* Every job has a fingerprint built from its inputs and implementation.
+  Table semantics also depend on linked dictionary evidence, resolved after
+  the metadata phase.
 * Teammates' modules are resolved lazily. Until a tool exists, its components
   get a ``deferred`` ToolResult; once the module appears its code hash changes
   the fingerprint and resume runs it.
@@ -41,6 +40,9 @@ from .state import RunState, Stopwatch, write_text_atomic
 
 ProgressFn = Callable[[dict[str, Any]], None]
 TERMINAL = {"done", "removed"}
+DEFAULT_SEMANTICS = "agents.investigator.semantics:build_semantic_profile"
+EVIDENCE_KINDS = {"tool", "metadata"}
+INTERPRETATION_KINDS = {"semantics", "report"}
 
 
 # ----- registry -----------------------------------------------------------------
@@ -65,12 +67,13 @@ DEFAULT_TOOLS: dict[str, ToolSpec] = {
 class Stages:
     """Optional downstream stages; each is skipped until its module exists.
 
-    semantics(metadata: dict, *, budget: ModelBudget, config: Config) -> dict
+    The built-in semantic stage receives linked dictionary evidence.
+    Custom stages receive (metadata, *, budget, config).
     report(run_dir: Path) -> str       Markdown
     notebook(run_dir: Path) -> str     marimo notebook source
     """
 
-    semantics: str | None = "agents.investigator.semantics:build_semantic_profile"
+    semantics: str | None = DEFAULT_SEMANTICS
     report: str | None = "agents.investigator.reporting:render_report"
     notebook: str | None = "agents.investigator.reporting:render_notebook"
 
@@ -124,9 +127,8 @@ class ModelBudget:
             if self.used >= self.max_total:
                 raise BudgetExhausted(f"Model request budget of {self.max_total} is used up")
             self.used += 1
-            used = self.used
-        if self._on_use:
-            self._on_use(used)
+            if self._on_use:
+                self._on_use(self.used)
         with self._slots:
             yield
 
@@ -181,9 +183,9 @@ def plan_jobs(inventory: Inventory, keys: dict[str, str], config: Config,
     jobs: dict[str, dict[str, Any]] = {}
     tool_limits = asdict(ToolLimits())
     meta_hash = code_hash("agents.investigator.metadata:build_metadata")
-    sem_hash = code_hash(stages.semantics) if config.model.enabled else None
-    has_key = config.api_key() is not None
-    report_deps: list[str] = []
+    builtin_semantics = stages.semantics == DEFAULT_SEMANTICS
+    sem_hash = code_hash(stages.semantics) if config.model.enabled and not builtin_semantics else None
+    has_key = bool(sem_hash and config.api_key())
     for order, component in enumerate(inventory.components):
         short = _short(component.component_id)
         spec = tools.get(component.kind)
@@ -204,21 +206,29 @@ def plan_jobs(inventory: Inventory, keys: dict[str, str], config: Config,
         meta_id = f"meta-{short}"
         jobs[meta_id] = {"kind": "metadata", "order": order, "component_id": component.component_id,
                          "deps": [tool_id], "fingerprint": _digest([jobs[tool_id]["fingerprint"], meta_hash])}
-        report_deps.append(meta_id)
         if sem_hash:
             sem_id = f"sem-{short}"
             jobs[sem_id] = {"kind": "semantics", "order": order, "component_id": component.component_id,
                             "deps": [meta_id], "fingerprint": _digest([jobs[meta_id]["fingerprint"], sem_hash,
                                                                       config.model.name, has_key])}
-            report_deps.append(sem_id)
-    report_code = [code_hash(stages.report), code_hash(stages.notebook), code_hash(__name__ + ":x")]
-    jobs["report"] = {"kind": "report", "order": len(inventory.components), "component_id": None,
-                      "deps": report_deps,
-                      "fingerprint": _digest([jobs[d]["fingerprint"] for d in report_deps] + report_code)}
+    if not builtin_semantics:
+        jobs["report"] = _report_plan(jobs, stages)
     return jobs
 
 
-def reconcile(state: RunState, planned: dict[str, dict[str, Any]], *, retry_failed: bool = False) -> dict[str, int]:
+def _report_plan(jobs: dict[str, dict[str, Any]], stages: Stages) -> dict[str, Any]:
+    dependencies = {job_id: job for job_id, job in jobs.items()
+                    if job["kind"] in {"metadata", "semantics"} and job.get("status") != "removed"}
+    report_code = [code_hash(stages.report), code_hash(stages.notebook), code_hash(__name__ + ":x")]
+    return {"kind": "report", "order": len(dependencies), "component_id": None,
+            "deps": sorted(dependencies),
+            "fingerprint": _digest([report_code, {
+                job_id: [job["fingerprint"], job.get("outputs")] for job_id, job in dependencies.items()
+            }])}
+
+
+def reconcile(state: RunState, planned: dict[str, dict[str, Any]], *, retry_failed: bool = False,
+              kinds: set[str] | None = None) -> dict[str, int]:
     """Merge a fresh plan into the checkpoint; returns counts of what changed."""
     jobs = state.checkpoint.setdefault("jobs", {})
     counts = {"new": 0, "invalidated": 0, "removed": 0, "reused": 0, "retry": 0}
@@ -242,7 +252,7 @@ def reconcile(state: RunState, planned: dict[str, dict[str, Any]], *, retry_fail
         else:
             counts["reused"] += 1
     for job_id, old in jobs.items():
-        if job_id not in planned and old.get("status") != "removed":
+        if job_id not in planned and old.get("status") != "removed" and (kinds is None or old["kind"] in kinds):
             old["status"] = "removed"
             counts["removed"] += 1
             state.event("job_removed", job_id=job_id, reason="component no longer in inventory")
@@ -250,7 +260,8 @@ def reconcile(state: RunState, planned: dict[str, dict[str, Any]], *, retry_fail
     cascading = True
     while cascading:
         cascading = False
-        for job in jobs.values():
+        for job_id in planned:
+            job = jobs[job_id]
             if job["status"] == "done" and any(jobs.get(d, {}).get("status") == "pending" for d in job.get("deps", [])):
                 job["status"] = "pending"
                 counts["reused"] -= 1
@@ -314,6 +325,8 @@ class Scheduler:
         self.progress = progress
         self.components = {c.component_id: c for c in inventory.components}
         self.sources = {s.source_id: s for s in inventory.sources}
+        self.builtin_semantics = self.stages.semantics == DEFAULT_SEMANTICS
+        self.semantic_evidence: dict[str, dict] = {}
         self.budget = ModelBudget(
             config.limits.model_requests_per_run, config.limits.concurrent_model_requests,
             used=state.checkpoint.get("model_requests_used", 0), on_use=self._model_used,
@@ -323,6 +336,7 @@ class Scheduler:
     # -- bookkeeping
     def _model_used(self, used: int) -> None:
         self.state.checkpoint["model_requests_used"] = used
+        self.state.save_checkpoint()
 
     def _emit(self, event_type: str, /, **fields: Any) -> None:
         record = self.state.event(event_type, **fields)
@@ -332,11 +346,12 @@ class Scheduler:
     def _jobs(self) -> dict[str, dict[str, Any]]:
         return self.state.checkpoint["jobs"]
 
-    def _ready(self, running: dict[str, _Running]) -> list[str]:
+    def _ready(self, running: dict[str, _Running], *, evidence_only: bool) -> list[str]:
         jobs = self._jobs()
         ready = [
             job_id for job_id, job in jobs.items()
             if job["status"] == "pending" and job_id not in running
+            and (not evidence_only or job["kind"] in EVIDENCE_KINDS)
             and all(jobs.get(dep, {}).get("status") in TERMINAL for dep in job["deps"])
         ]
         return sorted(ready, key=lambda j: (jobs[j]["kind"] == "report", jobs[j]["order"], j))
@@ -362,7 +377,13 @@ class Scheduler:
                    component_id=job.get("component_id"), result_status=fields.get("result_status"))
 
     # -- main loop
-    def run(self) -> str:
+    def _schedule_started(self, *, evidence_only: bool) -> None:
+        jobs = [job for job in self._jobs().values()
+                if job["status"] != "removed" and (not evidence_only or job["kind"] in EVIDENCE_KINDS)]
+        self._emit("schedule_started", pending=sum(job["status"] == "pending" for job in jobs),
+                   total=len(jobs), workers=self.config.limits.local_workers)
+
+    def run(self, *, retry_failed: bool = False) -> str:
         stopwatch = Stopwatch(self.config.limits.run_seconds)
         running: dict[str, _Running] = {}
         self.state.checkpoint["status"] = "running"
@@ -371,9 +392,8 @@ class Scheduler:
             if job["status"] == "running":  # left over from a crash
                 job["status"] = "pending"
         self.state.save_checkpoint()
-        total = sum(1 for j in self._jobs().values() if j["status"] != "removed")
-        self._emit("schedule_started", pending=sum(1 for j in self._jobs().values() if j["status"] == "pending"),
-                   total=total, workers=self.config.limits.local_workers)
+        evidence_only = self.builtin_semantics
+        self._schedule_started(evidence_only=evidence_only)
         status = "completed"
         try:
             while True:
@@ -383,8 +403,13 @@ class Scheduler:
                     status = "incomplete"
                     break
                 self._reap(running)
-                ready = self._ready(running)
+                ready = self._ready(running, evidence_only=evidence_only)
                 if not ready and not running:
+                    if evidence_only:
+                        self._plan_semantics(retry_failed=retry_failed)
+                        evidence_only = False
+                        self._schedule_started(evidence_only=False)
+                        continue
                     break
                 for job_id in ready:
                     job = self._jobs()[job_id]
@@ -554,6 +579,50 @@ class Scheduler:
         path = self._jobs().get(job_id, {}).get("outputs", {}).get("result")
         return ToolResult.from_json(self.state.read_relative(path)) if path else None
 
+    def _component_metadata(self, component_id: str) -> dict:
+        path = self._jobs()[f"meta-{_short(component_id)}"]["outputs"].get("metadata")
+        return json.loads(self.state.read_relative(path)) if path else {"component_id": component_id}
+
+    def _plan_semantics(self, *, retry_failed: bool) -> None:
+        from .semantics import resolve_dictionaries
+
+        jobs = self._jobs()
+        tables, documents = {}, []
+        for cid, component in self.components.items():
+            if component.kind == "table":
+                tables[cid] = self._component_metadata(cid)
+            elif component.kind == "documents":
+                result = self._latest_result(f"tool-{_short(cid)}")
+                if result is not None:
+                    documents.append(result)
+        self.semantic_evidence, issues = resolve_dictionaries(self.inventory, tables, documents)
+        self.state.checkpoint["dictionary_reference_issues"] = issues
+        sem_hash = code_hash(self.stages.semantics)
+        model_fingerprint = None
+        settings = self.config.model
+        if settings.enabled and settings.interpret_semantics:
+            model_fingerprint = _digest([asdict(settings), self.config.api_key() is not None,
+                                         self.config.limits.model_requests_per_run,
+                                         code_hash("agents.semantic_agent:build_table_prompt")])
+
+        planned = {}
+        for order, cid in enumerate(tables):
+            short = _short(cid)
+            evidence = _digest([tables[cid], self.semantic_evidence[cid], sem_hash,
+                                jobs[f"tool-{short}"]["outputs"].get("result")])
+            enrichment = _digest([evidence, model_fingerprint]) if model_fingerprint else None
+            planned[f"sem-{short}"] = {
+                "kind": "semantics", "order": order, "component_id": cid, "deps": [f"meta-{short}"],
+                "enrichment_fingerprint": enrichment, "fingerprint": _digest([evidence, enrichment]),
+            }
+        metadata_jobs = {job_id: job for job_id, job in jobs.items() if job["kind"] == "metadata"}
+        report = _report_plan({**metadata_jobs, **planned}, self.stages)
+        report["fingerprint"] = _digest([report["fingerprint"], issues])
+        planned["report"] = report
+        counts = reconcile(self.state, planned, retry_failed=retry_failed, kinds=INTERPRETATION_KINDS)
+        self.state.event("semantic_plan_reconciled", **counts)
+        self.state.save_checkpoint()
+
     def _run_stage(self, job_id: str) -> None:
         job = self._jobs()[job_id]
         self._emit("job_started", job_id=job_id, kind=job["kind"], component_id=job.get("component_id"))
@@ -575,17 +644,24 @@ class Scheduler:
 
     def _run_semantics(self, job_id: str) -> None:
         job = self._jobs()[job_id]
-        if self.config.api_key() is None:
-            self._finish_job(job_id, {}, result_status="skipped",
-                             error=f"No model credentials in ${self.config.model.api_key_env}")
-            return
-        meta_path = self._jobs()[job["deps"][0]]["outputs"]["metadata"]
-        metadata = json.loads(self.state.read_relative(meta_path))
-        try:
-            profile = load_callable(self.stages.semantics)(metadata, budget=self.budget, config=self.config)
-        except BudgetExhausted as error:
-            self._finish_job(job_id, {}, result_status="skipped", error=str(error))
-            return
+        cid = job["component_id"]
+        metadata = self._component_metadata(cid)
+        build_profile = load_callable(self.stages.semantics)
+        if self.builtin_semantics:
+            tool = self._jobs()[f"tool-{_short(cid)}"]
+            source = self._component_sources(self.components[cid])[0]
+            profile = build_profile(metadata, source=source, result_path=tool["outputs"].get("result"),
+                                    dictionary=self.semantic_evidence[cid], budget=self.budget, config=self.config)
+        else:
+            if self.config.api_key() is None:
+                self._finish_job(job_id, {}, result_status="skipped",
+                                 error=f"No model credentials in ${self.config.model.api_key_env}")
+                return
+            try:
+                profile = build_profile(metadata, budget=self.budget, config=self.config)
+            except BudgetExhausted as error:
+                self._finish_job(job_id, {}, result_status="skipped", error=str(error))
+                return
         text = json.dumps(profile, indent=2, allow_nan=False) + "\n"
         path = self.state.save_versioned("semantics", job["component_id"], text)
         self._finish_job(job_id, {"semantics": path}, result_status="complete")
@@ -712,14 +788,14 @@ def execute_run(state: RunState, config: Config, *, tools: dict[str, ToolSpec] |
         for kind in ("added", "removed", "changed"):
             for path in changes[kind]:
                 state.event(f"source_{kind}", relative_path=path)
-        counts = reconcile(state, plan_jobs(inventory, keys, config, tools or DEFAULT_TOOLS, stages or Stages()),
-                           retry_failed=retry_failed)
+        scheduler = Scheduler(state, inventory, config, tools=tools, stages=stages, progress=progress)
+        counts = reconcile(state, plan_jobs(inventory, keys, config, scheduler.tools, scheduler.stages),
+                           retry_failed=retry_failed, kinds=EVIDENCE_KINDS if scheduler.builtin_semantics else None)
         state.event("plan_reconciled", **counts)
         state.save_checkpoint()
         if progress:
             progress({"type": "plan", "changes": changes, **counts})
-        scheduler = Scheduler(state, inventory, config, tools=tools, stages=stages, progress=progress)
-        return scheduler.run()
+        return scheduler.run(retry_failed=retry_failed)
     finally:
         state.release_lock()
 

@@ -6,8 +6,11 @@ The scheduler owns revision creation and writes returned strings atomically.
 from __future__ import annotations
 
 import json
+import re
+from html import escape
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 from .contracts import Inventory, ToolResult
 
@@ -37,8 +40,9 @@ def _snapshot(run_dir: Path) -> dict[str, Any]:
     results: dict[str, dict] = {}
     metadata: dict[str, dict] = {}
     semantics: dict[str, dict] = {}
+    document_artifacts: dict[str, str] = {}
     for job in jobs.values():
-        if not isinstance(job, dict):
+        if not isinstance(job, dict) or job.get("status") in {"pending", "running", "removed"}:
             continue
         component_id = job.get("component_id")
         outputs = job.get("outputs", {})
@@ -51,6 +55,12 @@ def _snapshot(run_dir: Path) -> dict[str, Any]:
                     result = ToolResult.from_json(file.read_text(encoding="utf-8"))
                     result.validate_references(inventory)
                     results[component_id] = result.to_dict()
+                    for source_id, document in result.measurements.get("documents", {}).items():
+                        name = document.get("text_artifact")
+                        if name:
+                            for artifact in result.artifacts:
+                                if artifact.relative_path.endswith("/" + name) and _safe_file(root, artifact.relative_path):
+                                    document_artifacts[source_id] = artifact.relative_path
                 except (ValueError, OSError):
                     pass
         for kind, destination in (("metadata", metadata), ("semantics", semantics)):
@@ -69,6 +79,8 @@ def _snapshot(run_dir: Path) -> dict[str, Any]:
                              "question": (data.get("request") or {}).get("question", "")})
     return {"inventory": inventory.to_dict(), "results": results,
             "metadata": metadata, "semantics": semantics, "analyses": analyses,
+            "document_artifacts": document_artifacts,
+            "dictionary_reference_issues": checkpoint.get("dictionary_reference_issues", []),
             "run_id": root.name}
 
 
@@ -77,7 +89,102 @@ def _cell(value: Any) -> str:
 
 
 def _json_block(data: Any) -> str:
-    return "```json\n" + json.dumps(data, indent=2, ensure_ascii=False, sort_keys=True) + "\n```"
+    body = json.dumps(data, indent=2, ensure_ascii=False, sort_keys=True)
+    fence = "`" * max(3, 1 + max(map(len, re.findall(r"`+", body)), default=0))
+    return f"{fence}json\n{body}\n{fence}"
+
+
+def _literal(value: Any) -> str:
+    text = escape(str(value), quote=False)
+    return re.sub(r"([\\`*_\[\]|~])", r"\\\1", " ".join(text.splitlines()))
+
+
+def _citation(citation: dict, documents: dict[str, str]) -> str:
+    label = _literal(citation["source_path"])
+    if citation.get("locator"):
+        label += f" ({_literal(citation['locator'])})"
+    artifact = citation.get("result_path") or documents.get(citation["source_id"])
+    return f"[{label}](../../{quote(artifact)})" if artifact else label
+
+
+def _reference_issue(issue: dict, documents: dict[str, str]) -> str:
+    table = _literal(issue["table"])
+    reason = issue["reason"]
+    if reason == "ambiguous_table":
+        message = f"Table reference **{table}** matches multiple tables."
+    elif reason == "missing_table":
+        message = f"Table reference **{table}** has no match in the inventory."
+    elif reason == "missing_column":
+        message = f"Table **{table}** has no column named **{_literal(issue['column'])}**."
+    else:
+        message = f"Column **{_literal(issue['column'])}** could not be verified in the table profile for **{table}**."
+    citations = ", ".join(_citation(citation, documents) for citation in issue["citations"])
+    return f"- {message} {citations}"
+
+
+def _table_semantics(profile: dict, documents: dict[str, str]) -> list[str]:
+    if "observation" not in profile:
+        return ["**Saved model interpretation**", "", _json_block(profile), ""]
+
+    lines = [f"#### Coded columns in {_literal(profile['observation']['source_path'])}", ""]
+    coverage = profile["coverage"]
+    if coverage.get("mode") in {"full", "sample"}:
+        total = coverage["total"] if coverage["total"] is not None else "an unknown total of"
+        summary = f"Profiled {coverage['examined']} of {total} rows."
+        if coverage["mode"] == "sample":
+            summary += " Counts and observed values describe the sample."
+        lines.extend([summary, ""])
+    else:
+        lines.extend(["Table row measurements are unavailable.", ""])
+    for item in profile["dictionary_coverage_limitations"]:
+        cited = ", ".join(_citation(c, documents) for c in item["citations"])
+        details = " ".join(_literal(detail) for detail in item["limitations"])
+        lines.extend([f"Dictionary extraction was incomplete. {details} {cited}", ""])
+
+    statuses = {"documented": "Documented",
+                "conflict": "Needs verification (conflict)",
+                "unresolved": "Needs verification (unresolved)"}
+    for name, column in profile["columns"].items():
+        lines.extend([f"**{_literal(name)}**", "",
+                      f"Observed counts and {column['null_count']} missing values. "
+                      f"Evidence from {_citation(column['observation_citation'], documents)}.", ""])
+        if column["truncated"]:
+            detail = " Showing the available top values." if column["values"] else ""
+            lines.extend([f"Frequency summary limited to {column['max_distinct']} distinct values. "
+                          f"The profiler found {column['distinct_count']} distinct values.{detail}", ""])
+        if column["values"]:
+            lines.extend(["| Observed value | Count | Dictionary definitions and citations | Status |",
+                          "|---|---:|---|---|"])
+        for row in column["values"]:
+            definitions = []
+            for definition in row["definitions"]:
+                citations = ", ".join(_citation(c, documents) for c in definition["citations"])
+                definitions.append(f"{_literal(definition['label'])} ({citations})")
+            meaning = "<br>".join(definitions) or "No definition found"
+            lines.append(f"| {_literal(row['value'])} | {row['count']} | {meaning} | {statuses[row['status']]} |")
+        if column["values"]:
+            lines.append("")
+
+    for issue in profile["needs_verification"]:
+        if issue["reason"] == "no_linked_dictionary":
+            lines.extend([f"**Needs verification** for **{_literal(issue['column'])}**. "
+                          "No dictionary entry links to this column.", ""])
+        elif issue["reason"] in {"missing_column", "table_columns_unavailable"}:
+            lines.extend([_reference_issue(issue, documents), ""])
+    if not profile["columns"]:
+        lines.extend(["No coded columns with value frequencies or dictionary entries were identified.", ""])
+
+    model = profile["model_interpretation"]
+    if model["status"] == "complete":
+        lines.extend([f"**Optional model interpretations ({_literal(model['model'])})**", ""])
+        for name, interpretation in model["columns"].items():
+            lines.append(f"- **{_literal(name)}** {_literal(interpretation['description'])}")
+            for hypothesis in interpretation["needs_verification"]:
+                lines.append(f"  - **Model hypothesis to verify** {_literal(hypothesis)}")
+        lines.append("")
+    elif model["status"] in {"skipped", "failed"}:
+        lines.extend([f"Optional model interpretation {model['status']}. {_literal(model['reason'])}", ""])
+    return lines
 
 
 def _markdown(data: dict[str, Any]) -> str:
@@ -112,11 +219,15 @@ def _markdown(data: dict[str, Any]) -> str:
         if cid in data["metadata"]:
             lines += ["**Assembled metadata (not independently remeasured):**", "", _json_block(data["metadata"][cid]), ""]
         if cid in data["semantics"]:
-            lines += ["**Saved model interpretation (not independently verified):**", "", _json_block(data["semantics"][cid]), ""]
+            lines += _table_semantics(data["semantics"][cid], data["document_artifacts"])
         if result["limitations"]:
             lines += ["**Limitations and uncertainty:**", ""]
             lines += [f"- {_cell(x)}" for x in result["limitations"]]
             lines.append("")
+    if data["dictionary_reference_issues"]:
+        lines += ["## Dictionary references that need verification", ""]
+        lines += [_reference_issue(issue, data["document_artifacts"]) for issue in data["dictionary_reference_issues"]]
+        lines.append("")
     lines += ["## Follow-up analyses", ""]
     if data["analyses"]:
         lines += [f"- `{_cell(a['job_id'])}` — {_cell(a['status'])}: {_cell(a['question'])}" for a in data["analyses"]]

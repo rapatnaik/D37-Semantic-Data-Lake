@@ -7,6 +7,8 @@ from urllib.request import Request, urlopen
 
 
 FIELDS = "description, semantic_type, unit (null if unknown), evidence (list), and needs_verification (list)."
+COLUMN_FIELDS = ("description", "semantic_type", "unit", "evidence", "needs_verification")
+DEFAULT_ENDPOINT = "https://ellm.nrp-nautilus.io/v1/chat/completions"
 RULES = (
     "State a claim as fact only when the supplied metadata directly supports it. "
     "If the evidence suggests a meaning but leaves room for other interpretations, "
@@ -43,8 +45,8 @@ def interpret_column(profile, column_name, model="gpt-oss"):
     return request_completion(build_column_prompt(profile, column_name), model)
 
 
-def request_completion(prompt, model):
-    token = os.environ.get("NRP_KEY")
+def request_completion(prompt, model, *, endpoint=DEFAULT_ENDPOINT, api_key=None):
+    token = os.environ.get("NRP_KEY") if api_key is None else api_key
     if not token:
         raise ValueError("Set NRP_KEY to your NRP LLM API key.")
 
@@ -53,7 +55,7 @@ def request_completion(prompt, model):
         "messages": [{"role": "user", "content": prompt}],
     }
     request = Request(
-        "https://ellm.nrp-nautilus.io/v1/chat/completions",
+        endpoint,
         data=json.dumps(payload).encode("utf-8"),
         headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
     )
@@ -91,7 +93,7 @@ def parse_columns(reply, expected):
     for name, entry in columns.items():
         if not isinstance(entry, dict):
             raise ValueError(f"Expected an interpretation object for {name}.")
-        for field in ("description", "semantic_type", "unit", "evidence", "needs_verification"):
+        for field in COLUMN_FIELDS:
             if field not in entry:
                 raise ValueError(f"Missing {field} for {name}.")
             value = entry[field]

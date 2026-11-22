@@ -1,7 +1,7 @@
 # d37-agent runtime: CLI, scheduling, execution
 
 This is the runtime that connects everyone's parts. It discovers inputs, runs the
-tested tools in parallel, assembles metadata, runs the optional model stages,
+tested tools in parallel, assembles metadata, reconciles dictionary definitions,
 executes generated analysis code in an isolated worker, and writes the report.
 It checkpoints after every job, so a run can be resumed.
 
@@ -21,6 +21,35 @@ uv run d37-agent ask path/to/data "Blank ages by group" \
 
 `python -m agents.investigator ...` works without installing. For model stages,
 put `NRP_KEY` in `.env` and add `--env-file .env` to `uv run`.
+
+## Coded columns
+
+A run profiles table values and checks them against explicit dictionary entries
+in extracted document text. A TXT or Markdown dictionary uses this format.
+
+```text
+Table: data/status.csv
+Column: status
+0 = inactive
+1 = active
+```
+
+Use an inventory-relative table path or a filename that is unique among the
+tables. Use `./status.csv` to specify a root-level table when its filename is
+shared. Column names are case-sensitive.
+
+The report and versioned JSON profile show measured counts, cited definitions,
+conflicts, and unresolved values. Complete frequency summaries cover up to 20
+distinct non-null values in the profiled rows. The report identifies sampled
+counts, incomplete dictionary extraction, and frequency limits. To try the
+six-row demo, copy `examples/status_dictionary_demo` to a temporary directory
+and run `d37-agent run` on the copy. Change `1 = pending` to `1 = active` in
+`dictionary_b.txt` and resume the same run to clear the conflict for code 1.
+
+Dictionary reconciliation runs offline. For optional model interpretations, use
+`d37-agent run --interpret-semantics DATA_DIR` or set
+`interpret_semantics = true` in the model settings. The report labels the model's
+descriptions and hypotheses separately from dictionary evidence.
 
 **macOS: `ModuleNotFoundError: No module named 'agents'` from `d37-agent`.**
 macOS sometimes marks the files in `.venv` as hidden, and Python 3.12 or newer
@@ -53,6 +82,7 @@ analysis_memory_mb = 1024
 endpoint = "https://ellm.nrp-nautilus.io/v1/chat/completions"
 name = "gpt-oss"
 api_key_env = "NRP_KEY"       # the name of the environment variable, never the key
+interpret_semantics = false  # opt in to model descriptions and hypotheses
 
 [execution]
 backend = "docker"            # or "process" (development only, see below)
@@ -88,8 +118,9 @@ also excluded.
 
 ## Scheduling and invalidation
 
-Each component in the inventory gets this chain of jobs:
-`tool-<c> → meta-<c> → sem-<c> (if a semantics stage exists) → report`.
+Each component gets a tool and metadata job. The scheduler links extracted
+dictionaries to tables once metadata is ready, then runs table semantic jobs
+and generates the report.
 Tool jobs run in parallel in separate spawned processes, so a hung tool can be
 stopped (`tool_timeout_seconds`, default 300). Metadata, semantics and report
 jobs run in the main process.
@@ -98,8 +129,9 @@ Each job's fingerprint covers its inputs' content (SHA-256), the source code of
 the module that runs it, the selector, the seed and the limits, plus the
 fingerprints of the jobs it depends on. On `resume`:
 
-- A **changed file** reruns its tool job, its metadata and semantics, and the
-  report. Nothing else reruns.
+- A **changed file** reruns its tool and metadata jobs. The semantic profile
+  advances for tables whose measurements or linked dictionary evidence changed.
+  Dictionary additions, removals, and retargeting are resolved on each resume.
 - A **touched file with identical content** (only its mtime changed) is not rerun.
 - **Added or removed files** add or remove their jobs.
 - **Teammate code that has changed or newly appeared** reruns the jobs that use
@@ -124,7 +156,7 @@ or deferred, and that is recorded in the run.
 | Vaidehi | `agents.investigator.tools.documents:extract_document` | `(source, context) -> ToolResult` |
 | Vaidehi | `agents.investigator.reporting:render_report` | `(run_dir) -> str` (Markdown) |
 | Vaidehi | `agents.investigator.reporting:render_notebook` | `(run_dir) -> str` (marimo source) |
-| Jacob | `agents.investigator.semantics:build_semantic_profile` | `(metadata, *, budget, config) -> dict` |
+| Jacob | `agents.investigator.semantics:build_semantic_profile` | `(metadata, *, source, result_path, dictionary, budget, config) -> dict` |
 | Jacob | `agents.investigator.investigation:choose_next_action` | `(InvestigationContext) -> ToolCall \| AnalysisRequest \| Completion` |
 
 The registry is `DEFAULT_TOOLS` / `Stages` in `scheduler.py`. If a name or

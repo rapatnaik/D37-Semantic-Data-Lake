@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import random
 from pathlib import Path
 from typing import Any
@@ -29,6 +30,13 @@ SUPPORTED_FORMATS = {
 
 MAX_SOURCE_BYTES = 25 * 1024 * 1024
 DEFAULT_SAMPLE_SIZE = 1000
+MAX_FREQUENCY_VALUES = 20
+TABLE_PROFILE_VERSION = "table_profile_v2"
+
+
+def _padded_columns(text):
+    """Treat leading-zero integers in untyped delimited files as text codes."""
+    return {name for name in text if text[name].str.fullmatch(r"[+-]?0[0-9]+").any()}
 
 
 # ---------------------------------------------------------
@@ -50,23 +58,24 @@ def read_table(path, sheet_name=0):
             f"Unsupported table format: {extension}"
         )
 
-    if extension == ".csv":
-        df = pd.read_csv(path)
-
-    elif extension == ".tsv":
-        df = pd.read_csv(path, sep="\t")
+    if extension in {".csv", ".tsv"}:
+        separator = "\t" if extension == ".tsv" else ","
+        df = pd.read_csv(path, sep=separator)
+        text = pd.read_csv(path, sep=separator, dtype=str)
+        for name in _padded_columns(text):
+            df[name] = text[name]
 
     elif extension == ".parquet":
         df = pd.read_parquet(path)
 
     elif extension in (".xlsx", ".xls"):
-        df = pd.read_excel(
-            path,
-            sheet_name=sheet_name
-        )
+        sheets = pd.read_excel(path, sheet_name=sheet_name, dtype=object)
+        if isinstance(sheets, dict):
+            return {name: sheet.infer_objects() for name, sheet in sheets.items()}
+        df = sheets.infer_objects()
 
     elif extension == ".jsonl":
-        df = pd.read_json(path, lines=True)
+        df = pd.read_json(path, lines=True, dtype=False)
 
     elif extension == ".json":
         with path.open("r", encoding="utf-8") as file:
@@ -117,37 +126,37 @@ def sample_delimited_table(
     rng = random.Random(seed)
 
     sampled_rows = []
+    padded_columns = set()
     total_rows = 0
     columns = None
 
-    for chunk in pd.read_csv(
-        path,
-        sep=separator,
-        chunksize=1000,
-        low_memory=False
+    options = {"sep": separator, "chunksize": 1000, "low_memory": False}
+    with (
+        pd.read_csv(path, **options) as chunks,
+        pd.read_csv(path, dtype=str, **options) as text_chunks,
     ):
-        if columns is None:
+        for chunk, text in zip(chunks, text_chunks, strict=True):
             columns = list(chunk.columns)
-
-        for row in chunk.itertuples(
-            index=False,
-            name=None
-        ):
-            total_rows += 1
-
-            if len(sampled_rows) < sample_size:
-                sampled_rows.append(row)
-
-            else:
-                index = rng.randrange(total_rows)
-
-                if index < sample_size:
-                    sampled_rows[index] = row
+            padded_columns.update(_padded_columns(text))
+            rows = chunk.itertuples(index=False, name=None)
+            raw_rows = text.itertuples(index=False, name=None)
+            for row in zip(rows, raw_rows, strict=True):
+                total_rows += 1
+                if len(sampled_rows) < sample_size:
+                    sampled_rows.append(row)
+                else:
+                    index = rng.randrange(total_rows)
+                    if index < sample_size:
+                        sampled_rows[index] = row
 
     sampled_df = pd.DataFrame(
-        sampled_rows,
+        [row for row, _ in sampled_rows],
         columns=columns
     )
+    if padded_columns:
+        text_df = pd.DataFrame([raw for _, raw in sampled_rows], columns=columns)
+        for name in padded_columns:
+            sampled_df[name] = text_df[name]
 
     return sampled_df, total_rows
 
@@ -156,7 +165,7 @@ def sample_delimited_table(
 # 3. Table statistics
 # ---------------------------------------------------------
 
-def calculate_table_statistics(df):
+def calculate_table_statistics(df, *, sampled=False):
     """
     Calculate factual EDA statistics without changing data.
 
@@ -195,11 +204,14 @@ def calculate_table_statistics(df):
             )
         }
 
-        # Numerical columns
-        if (
+        is_numeric = (
             pd.api.types.is_numeric_dtype(series)
             and not pd.api.types.is_bool_dtype(series)
-        ):
+        )
+        truncated = distinct_count > MAX_FREQUENCY_VALUES
+        counts = series.value_counts(dropna=True) if not is_numeric or not truncated else None
+        # Numerical columns
+        if is_numeric:
             numeric = (
                 series.replace(
                     [float("inf"), -float("inf")],
@@ -235,17 +247,30 @@ def calculate_table_statistics(df):
 
         # Categorical and other non-numeric columns
         else:
-            counts = series.value_counts(
-                dropna=True
-            ).head(5)
-
             info["top_values"] = [
                 {
                     "value": str(value),
                     "count": int(count)
                 }
-                for value, count in counts.items()
+                for value, count in counts.head(5).items()
             ]
+
+        frequencies = []
+        if not truncated:
+            for value, count in counts.items():
+                if not count:  # Unused levels of a categorical dtype.
+                    continue
+                value = value.item() if hasattr(value, "item") else value
+                if not isinstance(value, (int, float)) or (isinstance(value, float) and not math.isfinite(value)):
+                    value = str(value)
+                frequencies.append({"value": value, "count": int(count)})
+        info["value_frequencies"] = {
+            "values": frequencies,
+            "sampled": sampled,
+            "truncated": truncated,
+            "max_distinct": MAX_FREQUENCY_VALUES,
+            "numeric": is_numeric,
+        }
 
         columns[column_name] = info
 
@@ -299,7 +324,7 @@ def profile_table(
             component_id=context.component_id,
             status=status,
             inputs=[source.source_id],
-            method="table_profile_v1",
+            method=TABLE_PROFILE_VERSION,
             parameters={
                 "max_source_bytes": max_source_bytes,
                 "format": source.format,
@@ -383,7 +408,7 @@ def profile_table(
                 seed=seed
             )
 
-            measurements = calculate_table_statistics(df)
+            measurements = calculate_table_statistics(df, sampled=True)
 
             # Uniqueness in a sample does not prove
             # uniqueness in the entire dataset.
@@ -401,7 +426,7 @@ def profile_table(
                 component_id=context.component_id,
                 status="complete",
                 inputs=[source.source_id],
-                method="table_profile_v1",
+                method=TABLE_PROFILE_VERSION,
                 parameters={
                     "max_source_bytes": max_source_bytes,
                     "sample_size": sample_size,

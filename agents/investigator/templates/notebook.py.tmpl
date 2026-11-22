@@ -55,7 +55,7 @@ def _(mo, snapshot):
 
 @app.cell
 def _(mo, snapshot):
-    mo.accordion({cid: mo.md("**Saved interpretation (unverified)**\n```json\n" + __import__("json").dumps(result, indent=2) + "\n```")
+    mo.accordion({cid: mo.md("**Saved semantic profile**\n```json\n" + __import__("json").dumps(result, indent=2) + "\n```")
                   for cid, result in snapshot["semantics"].items()})
     return
 

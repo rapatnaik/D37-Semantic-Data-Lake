@@ -83,6 +83,8 @@ def _config(args: argparse.Namespace) -> Config:
         limits["run_seconds"] = args.time_limit
     if getattr(args, "no_model", False):
         model["enabled"] = False
+    if getattr(args, "interpret_semantics", False):
+        model.update(enabled=True, interpret_semantics=True)
     config = with_overrides(config, execution=execution, limits=limits, model=model)
     if getattr(args, "no_hash", False):
         top["hash_inputs"] = False
@@ -252,7 +254,9 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--backend", choices=["docker", "process"], help="custom-code isolation backend")
     run.add_argument("--workers", type=int, help="local worker processes (default 4)")
     run.add_argument("--time-limit", type=int, help="seconds per invocation (default 900)")
-    run.add_argument("--no-model", action="store_true", help="skip model-backed stages")
+    model = run.add_mutually_exclusive_group()
+    model.add_argument("--no-model", action="store_true", help="skip model-backed stages")
+    model.add_argument("--interpret-semantics", action="store_true", help="request optional model interpretations")
     run.add_argument("--no-hash", action="store_true", help="detect changes by size/mtime only")
     run.set_defaults(func=cmd_run)
 

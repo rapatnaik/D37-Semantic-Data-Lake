@@ -1,7 +1,7 @@
 """Bounded, read-only document extraction for TXT, Markdown, PDF and DOCX.
 
-Text artifacts are written beneath ToolContext.output_dir. Measurements contain
-summaries and references, not raw document text. No OCR is performed.
+Text artifacts are written beneath ToolContext.output_dir. Measurements record
+summaries, references, and explicitly declared dictionary entries. No OCR is performed.
 """
 from __future__ import annotations
 
@@ -13,6 +13,38 @@ from typing import Any
 from ..contracts import ArtifactRef, Coverage, SourceRef, ToolResult
 
 SUPPORTED = {"txt", "md", "pdf", "docx"}
+_DECLARATION = re.compile(r"^(Table|Column)\s*:\s*(.*?)\s*$", re.IGNORECASE)
+
+
+def _dictionary_evidence(text_parts: list[tuple[str, str, bool]], source_id: str) -> dict:
+    """Parse explicit declarations from the same bounded text saved as an artifact."""
+    table = column = None
+    tables, entries = [], []
+    for reference, part, complete in text_parts:
+        lines = part.splitlines()
+        if not complete and not part.endswith("\n"):
+            lines = lines[:-1]
+        for number, line in enumerate(lines, 1):
+            line = line.strip()
+            locator = reference if reference.startswith("line ") else f"{reference}, line {number}"
+            citation = {"source_id": source_id, "locator": locator}
+            declaration = _DECLARATION.fullmatch(line)
+            if declaration:
+                kind, value = declaration.groups()
+                if value.startswith("`") and value.endswith("`"):
+                    value = value[1:-1].strip()
+                if kind.lower() == "table":
+                    table, column = value, None
+                    if table:
+                        tables.append({"table": table, "citation": citation})
+                else:
+                    column = value
+            elif table and column:
+                code, separator, label = (piece.strip() for piece in line.partition("="))
+                if separator and code and label:
+                    entries.append({"table": table, "column": column, "code": code, "label": label,
+                                    "citation": citation})
+    return {"tables": tables, "entries": entries}
 
 
 def _limit(context: Any, key: str, default: int) -> int:
@@ -113,10 +145,12 @@ def extract_document(source: SourceRef, context: Any) -> ToolResult:
                 lines = text.splitlines()
                 total = len(lines)
                 # Preserve line references and record headings for Markdown.
+                length = 0
                 for i, line in enumerate(lines, 1):
-                    if sum(len(x["text"]) for x in sections) >= max_chars:
+                    if length >= max_chars:
                         break
                     sections.append({"reference": f"line {i}", "text": line})
+                    length += len(line) + 1
                 item["headings"] = [{"line": i, "heading": line.lstrip("# ").strip()}
                                     for i, line in enumerate(lines, 1) if fmt == "md" and re.match(r"^#{1,6}\s", line)][:100]
             elif fmt == "pdf":
@@ -140,9 +174,9 @@ def extract_document(source: SourceRef, context: Any) -> ToolResult:
         if remaining <= 0:
             break
         part = section["text"][:remaining]
-        text_parts.append((section["reference"], part))
+        text_parts.append((section["reference"], part, len(part) == len(section["text"])))
         remaining -= len(part)
-    extracted = "\n".join(part for _, part in text_parts)
+    extracted = "\n".join(part for _, part, _ in text_parts)
     examined = len(text_parts)
     if total is None:
         total = examined
@@ -150,7 +184,7 @@ def extract_document(source: SourceRef, context: Any) -> ToolResult:
         status = "partial"
     if examined < total:
         issues.append(f"Only {examined} of {total} document units extracted (resource limit or truncation).")
-    if sections and len(extracted) >= max_chars:
+    if any(not complete for _, _, complete in text_parts):
         issues.append(f"Extracted text limited to {max_chars} characters.")
         if status == "complete":
             status = "partial"
@@ -163,9 +197,10 @@ def extract_document(source: SourceRef, context: Any) -> ToolResult:
                  "units_examined": examined, "units_total": total,
                  "character_count": len(extracted), "word_count": len(re.findall(r"\b\w+\b", extracted)),
                  "empty_content": not bool(extracted.strip()), "possible_scanned_document": fmt == "pdf" and not bool(extracted.strip()),
-                 "references": [{"reference": ref, "characters": len(txt)} for ref, txt in text_parts[:500]],
+                 "references": [{"reference": ref, "characters": len(txt)} for ref, txt, _ in text_parts[:500]],
                  "role": "unclassified_document", "role_note": "Supporting documentation versus text dataset requires external evidence."})
     if status in {"complete", "partial"}:
+        item["dictionary"] = _dictionary_evidence(text_parts, source.source_id)
         name = f"documents/{hashlib.sha256(source.source_id.encode()).hexdigest()[:16]}.txt"
         _output(context, name).write_text(extracted, encoding="utf-8")
         artifacts.append(context.artifact(name, "text/plain") if hasattr(context, "artifact") else
@@ -173,11 +208,11 @@ def extract_document(source: SourceRef, context: Any) -> ToolResult:
                              f"{context.result_id}:text", name, "text/plain"))
         item["text_artifact"] = name
     unit = "pages" if fmt in SUPPORTED else "files"
-    coverage = Coverage(mode="none" if examined == 0 else "full" if examined == total else "sample",
+    coverage = Coverage(mode="none" if examined == 0 else "full" if status == "complete" else "sample",
                         unit=unit, examined=examined, total=total,
                         selection="Document units in source order, bounded by byte/page/character limits; no random sampling",
                         seed=None)
     return ToolResult(result_id=str(context.result_id), component_id=str(context.component_id),
-                      status=status, inputs=[source.source_id], method="bounded_document_extraction_v1",
+                      status=status, inputs=[source.source_id], method="bounded_document_extraction_v2",
                       parameters={"max_text_chars": max_chars, "max_bytes_read": max_bytes, "max_document_pages": max_pages},
                       coverage=coverage, measurements=measurements, artifacts=artifacts, limitations=issues)

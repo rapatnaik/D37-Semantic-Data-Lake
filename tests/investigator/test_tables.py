@@ -733,7 +733,7 @@ class TableTests(unittest.TestCase):
                 return_value=expected,
             ) as excel_reader:
                 loaded = read_table(path)
-            excel_reader.assert_called_once_with(path, sheet_name=0)
+            excel_reader.assert_called_once_with(path, sheet_name=0, dtype=object)
             pd.testing.assert_frame_equal(loaded, expected)
 
     def test_json_records_reading(self):

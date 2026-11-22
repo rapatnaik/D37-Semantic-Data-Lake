@@ -1,0 +1,4 @@
+Table: status.csv
+Column: status
+0 = inactive
+1 = active

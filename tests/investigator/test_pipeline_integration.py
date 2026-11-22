@@ -38,7 +38,7 @@ class PipelineIntegrationTests(unittest.TestCase):
             image_path = root / "scan.png"
             Image.new("L", (20, 15), color=80).save(image_path)
 
-            # document tool is not available yet
+            # synthetic document
             readme_path = root / "README.md"
             readme_path.write_text(
                 "# Patient study\n",
@@ -59,8 +59,7 @@ class PipelineIntegrationTests(unittest.TestCase):
                 )
             )
 
-            # Disable unfinished semantic/reporting modules.
-            # The scheduler still generates its fallback report.
+            # Exercise the fallback report alongside the tool and metadata stages.
             stages = Stages(
                 semantics=None,
                 report=None,
@@ -158,13 +157,15 @@ class PipelineIntegrationTests(unittest.TestCase):
 
             # verifying document metadata
             document_metadata = metadata_by_kind["documents"]
-
+            document_result = document_metadata["results"][0]
+            document_source_id = document_metadata["source_ids"][0]
             self.assertEqual(
-                document_metadata["results"][0]["status"],
-                "deferred"
+                document_result["status"],
+                "complete"
             )
-            self.assertTrue(
-                document_metadata["results"][0]["limitations"]
+            self.assertEqual(
+                document_result["measurements"]["documents"][document_source_id]["word_count"],
+                2
             )
 
             # check whether fallback report was generated

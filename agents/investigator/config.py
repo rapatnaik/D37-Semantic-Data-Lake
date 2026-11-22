@@ -63,6 +63,7 @@ class ModelSettings:
     name: str = "gpt-oss"
     api_key_env: str = "NRP_KEY"
     enabled: bool = True
+    interpret_semantics: bool = False
 
 
 @dataclass(frozen=True)
