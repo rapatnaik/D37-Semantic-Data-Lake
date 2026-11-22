@@ -46,7 +46,7 @@ six-row demo, copy `examples/status_dictionary_demo` to a temporary directory
 and run `d37-agent run` on the copy. Change `1 = pending` to `1 = active` in
 `dictionary_b.txt` and resume the same run to clear the conflict for code 1.
 
-The semantic agent sends table metadata to the configured model by default
+The semantic agent sends table metadata to `qwen3` by default
 when credentials are available, including for tables without dictionaries.
 The report labels model descriptions and hypotheses alongside the cited
 dictionary findings. For an offline run, pass `--no-model` or set
@@ -56,9 +56,10 @@ dictionary findings. For an offline run, pass `--no-model` or set
 
 With model calls enabled and credentials available, TIFF inputs go through the
 image profiler and then a vision model. The request carries the saved PNG
-preview of the first frame, using `qwen3` by default. The semantic profile and
-report link to the preview and record its frame number and the total frame
-count. TIFF and table interpretation share the run's model request budget.
+preview of the first frame, its frame number and total frame count, the image
+dimensions and mode, and how the preview was transformed. The default vision
+model is `qwen3`. The semantic profile and report link to the preview. TIFF
+and table interpretation share the run's model request budget.
 
 **macOS: `ModuleNotFoundError: No module named 'agents'` from `d37-agent`.**
 macOS sometimes marks the files in `.venv` as hidden, and Python 3.12 or newer
@@ -89,7 +90,7 @@ analysis_memory_mb = 1024
 
 [model]
 endpoint = "https://ellm.nrp-nautilus.io/v1/chat/completions"
-name = "gpt-oss"
+name = "qwen3"
 vision_name = "qwen3"         # interprets TIFF previews on the same endpoint
 api_key_env = "NRP_KEY"       # the name of the environment variable, never the key
 interpret_semantics = true   # request model descriptions and hypotheses

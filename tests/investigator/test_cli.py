@@ -36,6 +36,8 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(limits.model_requests_per_run, 30)
         self.assertEqual(limits.repair_attempts, 2)
         self.assertEqual(Config().execution.backend, "docker")
+        self.assertEqual(Config().model.name, "qwen3")
+        self.assertEqual(Config().model.vision_name, "qwen3")
 
     def test_toml_settings(self):
         with tempfile.TemporaryDirectory() as temp:

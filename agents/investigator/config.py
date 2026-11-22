@@ -60,7 +60,7 @@ class Limits:
 @dataclass(frozen=True)
 class ModelSettings:
     endpoint: str = "https://ellm.nrp-nautilus.io/v1/chat/completions"
-    name: str = "gpt-oss"
+    name: str = "qwen3"
     api_key_env: str = "NRP_KEY"
     enabled: bool = True
     interpret_semantics: bool = True

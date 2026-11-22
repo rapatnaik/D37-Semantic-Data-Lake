@@ -9,6 +9,7 @@ from urllib.request import Request, urlopen
 FIELDS = "description, semantic_type, unit (null if unknown), evidence (list), and needs_verification (list)."
 COLUMN_FIELDS = ("description", "semantic_type", "unit", "evidence", "needs_verification")
 DEFAULT_ENDPOINT = "https://ellm.nrp-nautilus.io/v1/chat/completions"
+DEFAULT_MODEL = "qwen3"
 RULES = (
     "State a claim as fact only when the supplied metadata directly supports it. "
     "If the evidence suggests a meaning but leaves room for other interpretations, "
@@ -40,7 +41,7 @@ def build_column_prompt(profile, column_name):
     return f"Interpret the selected column. Return one JSON object with {FIELDS}\n{RULES}\n\n" + json.dumps(context, indent=2)
 
 
-def interpret_column(profile, column_name, model="gpt-oss"):
+def interpret_column(profile, column_name, model=DEFAULT_MODEL):
     """Send one column prompt to NRP and return the model's answer as text."""
     return request_completion(build_column_prompt(profile, column_name), model)
 
@@ -157,7 +158,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate semantic profiles using NRP.")
     parser.add_argument("profile", nargs="?", help="Metadata JSON for a single-column run")
     parser.add_argument("column", nargs="?", help="Column name for a single-column run")
-    parser.add_argument("--model", default="gpt-oss", help="NRP model ID")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help="NRP model ID")
     args = parser.parse_args()
     if bool(args.profile) != bool(args.column):
         parser.error("Supply both profile and column, or neither to process all profiles.")

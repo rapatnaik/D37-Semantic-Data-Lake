@@ -342,7 +342,7 @@ def evaluate_dataset(key, spec, metadata_profile, semantic_profile):
 def main():
     parser = argparse.ArgumentParser(description="Run both agents and evaluate them against Assignment 1.")
     parser.add_argument("--offline", action="store_true", help="reuse the latest saved semantic run (no LLM call)")
-    parser.add_argument("--model", default="gpt-oss", help="NRP model ID")
+    parser.add_argument("--model", default=semantic_agent.DEFAULT_MODEL, help="NRP model ID")
     args = parser.parse_args()
 
     print("Running metadata agent...")
