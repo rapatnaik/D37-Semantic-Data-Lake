@@ -1,11 +1,118 @@
 # D37-Semantic-Data-Lake
 DSC 180A Capstone D37 - Quarter 1 Project
 
-## Running the agents
+## Install `d37-agent`
 
-From the repository root, run `uv sync --locked` to install the agent dependencies.
-For NRP model calls, create a local `.env` using `.env.example` as a template
-and set `NRP_KEY` to your personal key. To interpret the chest pain column:
+Install `uv` with a compatible Python version (3.11 or newer). Clone the
+`analysis_agent` branch and install the locked dependencies from the repository
+root.
+
+```sh
+git clone --branch analysis_agent https://github.com/rapatnaik/D37-Semantic-Data-Lake.git
+cd D37-Semantic-Data-Lake
+uv sync --locked
+uv run --locked d37-agent --help
+```
+
+## Run your first investigation
+
+Copy the six-row demo so you can edit its dictionary without modifying the
+repository fixture.
+
+```sh
+demo_dir="$(mktemp -d)"
+cp examples/status_dictionary_demo/* "$demo_dir/"
+uv run --locked d37-agent run "$demo_dir" --no-model
+uv run --locked d37-agent status "$demo_dir"
+uv run --locked d37-agent runs "$demo_dir"
+```
+
+The run prints the path to `reports/revision-001/report.md` under
+`DATA_DIR/.d37-agent/runs/<run-id>/`. The report shows observed values,
+dictionary definitions with citations, and meanings that need verification.
+The run directory also contains versioned JSON evidence and a marimo notebook.
+
+To test resume, change `1 = pending` to `1 = active` in
+`$demo_dir/dictionary_b.txt` and resume the run.
+
+```sh
+uv run --locked d37-agent resume "$demo_dir"
+```
+
+Code `1` now has one definition with two citations. Resume reuses the table
+profile and saves a new report revision.
+
+### Run with Qwen
+
+Copy `.env.example` to `.env` if you need a local credentials file, and set
+`NRP_KEY` to your NRP key. Replace `path/to/data` with the directory to investigate.
+
+```sh
+uv run --locked --env-file .env d37-agent run path/to/data
+uv run --locked --env-file .env d37-agent resume path/to/data
+```
+
+With model calls enabled and credentials available, `qwen3` receives table
+metadata and, in separate requests, TIFF first-frame PNG previews with selected
+image metadata. The report labels the interpretations and links to the saved
+TIFF previews. Resume uses the model settings from the saved run. Use
+`run --no-model` for an offline run.
+
+To link a text dictionary to a table, declare the table path and exact column
+name in the document.
+
+```text
+Table: status.csv
+Column: status
+0 = inactive
+1 = active
+```
+
+Use a path relative to the data directory or a filename that uniquely identifies
+the table.
+
+## Subcommand reference
+
+Run `uv run --locked d37-agent <subcommand> --help` for all flags.
+`RUN_OR_DATA_DIR` is either a saved run directory or a data directory whose
+latest run you want to use.
+
+| Subcommand | Purpose | Useful options |
+| --- | --- | --- |
+| `run DATA_DIR` | Start a new investigation and write the report. | `--no-model` runs offline. `--workers N` limits local workers. `--time-limit SECONDS` sets the run time limit. |
+| `resume [RUN_OR_DATA_DIR]` | Continue a saved run and refresh outputs affected by changes. | `--retry-failed` retries jobs marked failed. |
+| `status [RUN_OR_DATA_DIR]` | Show job status, model request usage, and the report path. | `--json` emits a machine-readable summary. |
+| `runs DATA_DIR` | List saved runs, their statuses, and their paths. | `--state-dir DIR` locates runs stored outside the default directory. |
+| `ask RUN_OR_DATA_DIR "QUESTION"` | Run a follow-up analysis using supplied Python and selected inputs. | `--code FILE` supplies the script. Repeat `--input PATH` for each input. `--param KEY=VALUE` passes parameters. `--json` emits the session record. |
+
+Use `d37-agent --config FILE run DATA_DIR` to load TOML settings. See the
+[investigator guide](agents/investigator/README.md) for configuration, report files,
+and worker details.
+
+### Run a follow-up analysis
+
+Start Docker and build the worker image once from the repository root. The
+worker runs the supplied script against the selected inputs.
+
+```sh
+docker build -f containers/investigator/Dockerfile -t d37-investigator-worker:latest .
+
+analysis_file="$(mktemp -d)/count_status.py"
+cat > "$analysis_file" <<'PY'
+import csv
+
+with open(INPUT_FILES["status.csv"], newline="") as source:
+    row_count = sum(1 for _ in csv.DictReader(source))
+save_json("row_count.json", {"rows": row_count})
+PY
+uv run --locked d37-agent ask "$demo_dir" "How many status records are there?" \
+    --code "$analysis_file" --input status.csv
+```
+
+## Running the standalone semantic agent
+
+For NRP model calls, set `NRP_KEY` in the local `.env`. The following command
+interprets the chest pain column.
 
 ```sh
 uv run --locked --env-file .env python -m agents.semantic_agent outputs/metadata/heart_metadata.json cp

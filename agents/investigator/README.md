@@ -14,7 +14,6 @@ docker build -f containers/investigator/Dockerfile -t d37-investigator-worker:la
 uv run d37-agent run path/to/data    # new run → path/to/data/.d37-agent/runs/<run-id>/
 uv run d37-agent status path/to/data
 uv run d37-agent resume path/to/data # continue; reruns only what changed
-uv run d37-agent ask path/to/data "Are blank ages concentrated in one group?"
 uv run d37-agent ask path/to/data "Blank ages by group" \
     --code analysis.py --input patients.csv --param group_column=group
 ```
