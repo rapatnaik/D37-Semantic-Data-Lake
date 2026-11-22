@@ -41,6 +41,26 @@ class ReportingTests(unittest.TestCase):
         self.assertIn("word_count", report)
         self.assertIn("full: 1/1 files", report)
         self.assertIn("Reproducibility", report)
+        inventory = json.loads((self.run / "inventory.json").read_text())
+        cid = inventory["components"][0]["component_id"]
+        label = cid.removeprefix("component_")[:8] + "…"
+        self.assertIn("| Component ID |", report)
+        self.assertIn(f"| `{label}` |", report)
+        self.assertIn(f"### Component `{label}`", report)
+        self.assertNotIn(f"`{cid}`", report)
+
+    def test_component_labels_expand_to_distinguish_matching_prefixes(self):
+        path = self.run / "inventory.json"
+        inventory = json.loads(path.read_text())
+        component = inventory["components"][0]
+        for digit in ("a", "b"):
+            cid = f"component_01234567{digit}" + "0" * 55
+            inventory["components"].append({**component, "component_id": cid})
+        path.write_text(json.dumps(inventory))
+        report = render_report(self.run)
+        for digit in ("a", "b"):
+            self.assertIn(f"| `01234567{digit}…` |", report)
+            self.assertIn(f"### Component `01234567{digit}…`", report)
 
     def test_notebook_syntax_and_no_cloud_or_code_execution(self):
         source = render_notebook(self.run)

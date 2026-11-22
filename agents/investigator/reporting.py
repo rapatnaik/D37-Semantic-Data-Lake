@@ -210,24 +210,36 @@ def _tiff_semantics(profile: dict) -> list[str]:
     return lines
 
 
+def _component_labels(components: list[dict]) -> dict[str, str]:
+    """Display the shortest unique hash prefixes starting at eight characters."""
+    ids = [component["component_id"] for component in components]
+    digests = {cid: match[1] for cid in ids if (match := re.fullmatch(r"component_([0-9a-f]{64})", cid))}
+    for length in range(8, 64):
+        labels = {cid: f"{digests[cid][:length]}…" if cid in digests else cid for cid in ids}
+        if len(set(labels.values())) == len(ids):
+            return labels
+    return {cid: cid for cid in ids}
+
+
 def _markdown(data: dict[str, Any]) -> str:
     inventory = data["inventory"]
+    component_labels = _component_labels(inventory["components"])
     sources = {s["source_id"]: s["relative_path"] for s in inventory["sources"]}
     lines = [f"# D37 investigation — {data['run_id']}", "",
              "Generated from saved evidence only. No cloud reasoning or generated code was executed during reporting.", "",
              "## Inventory and coverage", "",
              f"Sources: {len(sources)}; components: {len(inventory['components'])}.", "",
-             "| Component | Kind | Sources | Status | Coverage |", "|---|---|---|---|---|"]
+             "| Component ID | Kind | Sources | Status | Coverage |", "|---|---|---|---|---|"]
     for comp in inventory["components"]:
         cid = comp["component_id"]
         result = data["results"].get(cid, {})
         coverage = result.get("coverage", {})
         summary = f"{coverage.get('mode', 'not measured')}: {coverage.get('examined', '?')}/{coverage.get('total', '?')} {coverage.get('unit', '')}"
-        lines.append(f"| `{_cell(cid)}` | {_cell(comp['kind'])} | {_cell(', '.join(sources.get(s, s) for s in comp['source_ids']))} | {_cell(result.get('status', 'not run'))} | {_cell(summary)} |")
+        lines.append(f"| `{_cell(component_labels[cid])}` | {_cell(comp['kind'])} | {_cell(', '.join(sources.get(s, s) for s in comp['source_ids']))} | {_cell(result.get('status', 'not run'))} | {_cell(summary)} |")
     lines.extend(["", "## Measurements and evidence", ""])
     for comp in inventory["components"]:
         cid = comp["component_id"]
-        lines += [f"### Component `{_cell(cid)}`", ""]
+        lines += [f"### Component `{_cell(component_labels[cid])}`", ""]
         result = data["results"].get(cid)
         if not result:
             lines += ["No validated tool result is available.", ""]
