@@ -4,10 +4,10 @@ import base64
 import io
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
+import threading
 import tempfile
 import unittest
 from dataclasses import replace
@@ -91,24 +91,8 @@ class SemanticCLITests(unittest.TestCase):
             self.assertEqual(saved["observation"]["result_path"], original_tool)
 
             text = original_report.read_text()
-            self.assertIn("Profiled 6 of 6 rows.", text)
-
-            def report_row(text, code):
-                return next(line for line in text.splitlines() if line.startswith(f"| {code} |"))
-
-            zero = report_row(text, 0)
-            self.assertIn("| 0 | 2 |", zero)
-            self.assertEqual(zero.count("inactive"), 1)
-            self.assertIn(r"dictionary\_a.txt (line 3)", zero)
-            self.assertIn(r"dictionary\_b.txt (line 3)", zero)
-            one = report_row(text, 1)
-            self.assertIn("| 1 | 3 | active", one)
-            self.assertIn(r"dictionary\_a.txt (line 4)", one)
-            self.assertIn(r"dictionary\_b.txt (line 4)", one)
-            self.assertIn("pending", one)
-            self.assertIn("Needs verification (conflict)", one)
-            self.assertIn("| 9 | 1 | No definition found | Needs verification (unresolved)", text)
-            old_document_link = re.findall(r"\]\((\.\./\.\./[^)]+)\)", one)[1]
+            self.assertNotIn("Coded columns", text)
+            self.assertIn(f"[Saved semantic profile JSON](../../{original_profile})", text)
 
             dictionary_b = data / "dictionary_b.txt"
             dictionary_b.write_text(dictionary_b.read_text().replace("pending", "active"), encoding="utf-8")
@@ -126,14 +110,10 @@ class SemanticCLITests(unittest.TestCase):
             self.assertEqual(corrected_codes[1]["status"], "documented")
             self.assertEqual(corrected_codes[9], codes[9])
             self.assertEqual([item["reason"] for item in corrected["needs_verification"]], ["undocumented_code"])
-            new_row = report_row(report_path(updated).read_text(), 1)
-            self.assertIn(r"dictionary\_a.txt (line 4)", new_row)
-            self.assertIn(r"dictionary\_b.txt (line 4)", new_row)
-            self.assertIn("| Documented |", new_row)
-            self.assertNotIn("pending", new_row)
+            refreshed_profile = outputs(updated, "semantics")[table]
+            self.assertIn(f"[Saved semantic profile JSON](../../{refreshed_profile})", report_path(updated).read_text())
             self.assertEqual(original_report.read_text(), text)
             self.assertEqual(json.loads(updated.read_relative(original_profile)), saved)
-            self.assertIn("1 = pending", (original_report.parent / old_document_link).read_text())
 
             unchanged = cli("resume")
             for kind in ("result", "metadata", "semantics"):
@@ -252,10 +232,7 @@ class SemanticStageTests(unittest.TestCase):
         self.assertEqual(set(definitions(text["1"])), {"plain"})
         self.assertEqual(saved["columns"]["text_code"]["null_count"], rows(saved, "status")[2]["count"])
         self.assertIn("absent", [e["label"] for e in saved["dictionary_entries"]])
-        report = report_path(state).read_text()
-        self.assertIn("Profiled 30 of 40 rows. Counts and observed values describe the sample.", report)
-        self.assertIn("Frequency summary limited to 20 distinct values.", report)
-        self.assertNotIn("| 100 |", report)
+        self.assertIn("sample: 30/40 rows", report_path(state).read_text())
 
     def test_partial_document_cites_only_complete_definitions(self):
         self.write("sample.csv", "code\n0\n1\n")
@@ -272,7 +249,6 @@ class SemanticStageTests(unittest.TestCase):
         limitation, = saved["dictionary_coverage_limitations"]
         self.assertEqual(limitation["status"], "partial")
         self.assertEqual(limitation["citations"][0]["locator"], "line 1")
-        self.assertIn("Dictionary extraction was incomplete", report_path(state).read_text())
 
     def test_checkpoint_resumes_between_each_phase(self):
         self.write("sample.csv", "code\n1\n")
@@ -293,7 +269,42 @@ class SemanticStageTests(unittest.TestCase):
         self.assertEqual(len(outputs(reconciled, "semantics")), 1)
         updated = self.resume_dataset(reconciled)
         self.assertEqual(outputs(updated, "semantics"), outputs(reconciled, "semantics"))
-        self.assertIn("| 1 | 1 | active", report_path(updated).read_text())
+        self.assertEqual(rows(profile(updated, "sample.csv"), "code")[1]["status"], "documented")
+
+    def test_concurrent_five_column_batches_merge_out_of_order(self):
+        names = [f"col{i:02d}" for i in range(16)]
+        self.write("wide.csv", ",".join(names) + "\n" + ",".join(["1"] * len(names)) + "\n")
+        overlap = threading.Barrier(3)
+        final_batch_started = threading.Event()
+        seen = []
+
+        def request(prompt, *args, **kwargs):
+            batch = list(json.loads(prompt.split("\n\n")[-1])["columns"])
+            seen.append(batch)
+            if len(batch) == 5:
+                overlap.wait(timeout=5)
+            else:
+                final_batch_started.set()
+            if batch == names[:5]:
+                self.assertTrue(final_batch_started.wait(timeout=5))
+            if batch == names[5:10]:
+                raise TimeoutError()
+            return json.dumps({name: {"description": name, "semantic_type": "code", "unit": None,
+                                      "evidence": [], "needs_verification": []} for name in batch})
+
+        config = replace(self.config, model=ModelSettings())
+        with patch.dict(os.environ, {config.model.api_key_env: "test-key"}), \
+                patch.object(semantic_agent, "request_completion", side_effect=request):
+            state = self.run_dataset(config)
+        self.assertCountEqual(seen, [names[:5], names[5:10], names[10:15], names[15:]])
+        interpretation = profile(state, "wide.csv")["model_interpretation"]
+        self.assertEqual(interpretation["status"], "partial")
+        self.assertEqual(list(interpretation["columns"]), names[:5] + names[10:])
+        for name, entry in interpretation["columns"].items():
+            self.assertEqual(entry["description"], name)
+        self.assertEqual(interpretation["batch_issues"][0]["columns"], names[5:10])
+        self.assertEqual(state.checkpoint["model_requests_used"], 4)
+        self.assertIn("Model batch failed for col05", report_path(state).read_text())
 
     def test_default_model_valid_malformed_missing_and_shared_budget(self):
         self.write("a.csv", "code\n1\n1\n")
@@ -319,7 +330,12 @@ class SemanticStageTests(unittest.TestCase):
         self.assertEqual(model_a["status"], "complete")
         self.assertNotIn("count", model_a["columns"]["code"])
         self.assertIn("budget", profile(enriched, "b.csv")["model_interpretation"]["reason"])
-        self.assertIn("Optional model interpretations (test-model)", report_path(enriched).read_text())
+        report = report_path(enriched).read_text()
+        self.assertIn("Model interpretations (test-model)", report)
+        self.assertIn("| code | A status code | code | — | — | Verify encoding |", report)
+        self.assertIn("[Saved semantic profile JSON]", report)
+        self.assertLess(report.index("## Inventory and coverage"), report.index("## Column descriptions"))
+        self.assertLess(report.index("## Column descriptions"), report.index("## Measurements and evidence"))
 
         with patch.dict(os.environ, {model.api_key_env: "test-credential"}), \
                 patch.object(semantic_agent, "request_completion", return_value='{"code": {}}'):

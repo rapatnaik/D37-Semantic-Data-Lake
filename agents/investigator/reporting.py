@@ -40,6 +40,7 @@ def _snapshot(run_dir: Path) -> dict[str, Any]:
     results: dict[str, dict] = {}
     metadata: dict[str, dict] = {}
     semantics: dict[str, dict] = {}
+    semantic_artifacts: dict[str, str] = {}
     document_artifacts: dict[str, str] = {}
     for job in jobs.values():
         if not isinstance(job, dict) or job.get("status") in {"pending", "running", "removed"}:
@@ -68,6 +69,8 @@ def _snapshot(run_dir: Path) -> dict[str, Any]:
                 file = _safe_file(root, outputs[kind])
                 if file and (data := _load_json(file)) is not None:
                     destination[component_id] = data
+                    if kind == "semantics":
+                        semantic_artifacts[component_id] = outputs[kind]
     # Snapshot references only saved, validated paths. Do not read raw inputs.
     analyses = []
     for file in sorted((root / "analyses").glob("*/result.json")):
@@ -79,7 +82,7 @@ def _snapshot(run_dir: Path) -> dict[str, Any]:
                              "question": (data.get("request") or {}).get("question", "")})
     return {"inventory": inventory.to_dict(), "results": results,
             "metadata": metadata, "semantics": semantics, "analyses": analyses,
-            "document_artifacts": document_artifacts,
+            "document_artifacts": document_artifacts, "semantic_artifacts": semantic_artifacts,
             "dictionary_reference_issues": checkpoint.get("dictionary_reference_issues", []),
             "run_id": root.name}
 
@@ -122,68 +125,25 @@ def _reference_issue(issue: dict, documents: dict[str, str]) -> str:
     return f"- {message} {citations}"
 
 
-def _table_semantics(profile: dict, documents: dict[str, str]) -> list[str]:
-    if "observation" not in profile:
-        return ["**Saved model interpretation**", "", _json_block(profile), ""]
-
-    lines = [f"#### Coded columns in {_literal(profile['observation']['source_path'])}", ""]
-    coverage = profile["coverage"]
-    if coverage.get("mode") in {"full", "sample"}:
-        total = coverage["total"] if coverage["total"] is not None else "an unknown total of"
-        summary = f"Profiled {coverage['examined']} of {total} rows."
-        if coverage["mode"] == "sample":
-            summary += " Counts and observed values describe the sample."
-        lines.extend([summary, ""])
-    else:
-        lines.extend(["Table row measurements are unavailable.", ""])
-    for item in profile["dictionary_coverage_limitations"]:
-        cited = ", ".join(_citation(c, documents) for c in item["citations"])
-        details = " ".join(_literal(detail) for detail in item["limitations"])
-        lines.extend([f"Dictionary extraction was incomplete. {details} {cited}", ""])
-
-    statuses = {"documented": "Documented",
-                "conflict": "Needs verification (conflict)",
-                "unresolved": "Needs verification (unresolved)"}
-    for name, column in profile["columns"].items():
-        lines.extend([f"**{_literal(name)}**", "",
-                      f"Observed counts and {column['null_count']} missing values. "
-                      f"Evidence from {_citation(column['observation_citation'], documents)}.", ""])
-        if column["truncated"]:
-            detail = " Showing the available top values." if column["values"] else ""
-            lines.extend([f"Frequency summary limited to {column['max_distinct']} distinct values. "
-                          f"The profiler found {column['distinct_count']} distinct values.{detail}", ""])
-        if column["values"]:
-            lines.extend(["| Observed value | Count | Dictionary definitions and citations | Status |",
-                          "|---|---:|---|---|"])
-        for row in column["values"]:
-            definitions = []
-            for definition in row["definitions"]:
-                citations = ", ".join(_citation(c, documents) for c in definition["citations"])
-                definitions.append(f"{_literal(definition['label'])} ({citations})")
-            meaning = "<br>".join(definitions) or "No definition found"
-            lines.append(f"| {_literal(row['value'])} | {row['count']} | {meaning} | {statuses[row['status']]} |")
-        if column["values"]:
-            lines.append("")
-
-    for issue in profile["needs_verification"]:
-        if issue["reason"] == "no_linked_dictionary":
-            lines.extend([f"**Needs verification** for **{_literal(issue['column'])}**. "
-                          "No dictionary entry links to this column.", ""])
-        elif issue["reason"] in {"missing_column", "table_columns_unavailable"}:
-            lines.extend([_reference_issue(issue, documents), ""])
-    if not profile["columns"]:
-        lines.extend(["No coded columns with value frequencies or dictionary entries were identified.", ""])
-
-    model = profile["model_interpretation"]
-    if model["status"] == "complete":
-        lines.extend([f"**Optional model interpretations ({_literal(model['model'])})**", ""])
+def _column_interpretations(model: dict) -> list[str]:
+    lines = []
+    if model["status"] in {"complete", "partial"}:
+        lines.extend([f"**Model interpretations ({_literal(model['model'])})**", "",
+                      "| Column | Description | Semantic type | Unit | Evidence cited by model | Needs verification |",
+                      "|---|---|---|---|---|---|"])
         for name, interpretation in model["columns"].items():
-            lines.append(f"- **{_literal(name)}** {_literal(interpretation['description'])}")
-            for hypothesis in interpretation["needs_verification"]:
-                lines.append(f"  - **Model hypothesis to verify** {_literal(hypothesis)}")
+            evidence = "<br>".join(map(_literal, interpretation["evidence"])) or "—"
+            verification = "<br>".join(map(_literal, interpretation["needs_verification"])) or "—"
+            cells = [_literal(name), _literal(interpretation["description"]),
+                     _literal(interpretation["semantic_type"]), _literal(interpretation["unit"] or "—"),
+                     evidence, verification]
+            lines.append("| " + " | ".join(cells) + " |")
         lines.append("")
     elif model["status"] in {"skipped", "failed"}:
-        lines.extend([f"Optional model interpretation {model['status']}. {_literal(model['reason'])}", ""])
+        lines.extend([f"Model interpretation {model['status']}. {_literal(model['reason'])}", ""])
+    for issue in model.get("batch_issues", []):
+        names = ", ".join(_literal(name) for name in issue["columns"])
+        lines.extend([f"Model batch {issue['status']} for {names}. {_literal(issue['reason'])}", ""])
     return lines
 
 
@@ -225,9 +185,8 @@ def _markdown(data: dict[str, Any]) -> str:
     inventory = data["inventory"]
     component_labels = _component_labels(inventory["components"])
     sources = {s["source_id"]: s["relative_path"] for s in inventory["sources"]}
-    lines = [f"# D37 investigation — {data['run_id']}", "",
-             "Generated from saved evidence only. No cloud reasoning or generated code was executed during reporting.", "",
-             "## Inventory and coverage", "",
+    lines = [f"# D37 investigation — {data['run_id']}", ""]
+    lines += ["## Inventory and coverage", "",
              f"Sources: {len(sources)}; components: {len(inventory['components'])}.", "",
              "| Component ID | Kind | Sources | Status | Coverage |", "|---|---|---|---|---|"]
     for comp in inventory["components"]:
@@ -236,29 +195,58 @@ def _markdown(data: dict[str, Any]) -> str:
         coverage = result.get("coverage", {})
         summary = f"{coverage.get('mode', 'not measured')}: {coverage.get('examined', '?')}/{coverage.get('total', '?')} {coverage.get('unit', '')}"
         lines.append(f"| `{_cell(component_labels[cid])}` | {_cell(comp['kind'])} | {_cell(', '.join(sources.get(s, s) for s in comp['source_ids']))} | {_cell(result.get('status', 'not run'))} | {_cell(summary)} |")
-    lines.extend(["", "## Measurements and evidence", ""])
+    lines.append("")
+    tables = []
+    linked_profiles = set()
     for comp in inventory["components"]:
         cid = comp["component_id"]
-        lines += [f"### Component `{_cell(component_labels[cid])}`", ""]
+        profile = data["semantics"].get(cid, {})
+        if comp["kind"] != "table" or not (model := profile.get("model_interpretation")):
+            continue
+        interpretations = _column_interpretations(model)
+        if interpretations:
+            linked_profiles.add(cid)
+            path = profile["observation"]["source_path"]
+            artifact = data["semantic_artifacts"][cid]
+            tables.extend([f"### {_literal(path)}", "", *interpretations,
+                           f"[Saved semantic profile JSON](../../{quote(artifact)})", ""])
+    if tables:
+        lines += ["## Column descriptions", "",
+                  "The model produced these interpretations during the investigation. "
+                  "The report displays the saved replies. Verify inferred meanings against source documentation.",
+                  "", *tables]
+    lines.extend(["## Measurements and evidence", ""])
+    for comp in inventory["components"]:
+        cid = comp["component_id"]
+        source_names = ", ".join(sources.get(source_id, source_id) for source_id in comp["source_ids"])
+        lines += [f"### {_literal(source_names or comp['kind'])}", ""]
         result = data["results"].get(cid)
         if not result:
             lines += ["No validated tool result is available.", ""]
             continue
         lines += [f"**Method:** `{_cell(result['method'])}`. **Status:** {result['status']}.", "",
-                  "**Coverage:** " + _json_block(result["coverage"]), "",
-                  "**Measured facts:**", "", _json_block(result["measurements"]), ""]
+                  "<details>", "<summary>Coverage and measured facts</summary>", "",
+                  "**Coverage**", "", _json_block(result["coverage"]), "",
+                  "**Measured facts**", "", _json_block(result["measurements"]), "",
+                  "</details>", ""]
         if result["artifacts"]:
             lines += ["**Saved artifacts** (paths relative to run directory):", ""]
             lines += [f"- `{_cell(a['relative_path'])}` ({_cell(a['media_type'])})" for a in result["artifacts"]]
             lines.append("")
         if cid in data["metadata"]:
-            lines += ["**Assembled metadata (not independently remeasured):**", "", _json_block(data["metadata"][cid]), ""]
-        if cid in data["semantics"]:
-            profile = data["semantics"][cid]
+            lines += ["<details>", "<summary>Assembled metadata</summary>", "",
+                      _json_block(data["metadata"][cid]), "", "</details>", ""]
+        if profile := data["semantics"].get(cid):
             if profile.get("kind") == "tiff":
                 lines += _tiff_semantics(profile)
-            else:
-                lines += _table_semantics(profile, data["document_artifacts"])
+            elif cid not in linked_profiles:
+                artifact = data["semantic_artifacts"][cid]
+                lines += [f"[Saved semantic profile JSON](../../{quote(artifact)})", ""]
+            issues = [issue for issue in profile.get("needs_verification", [])
+                      if isinstance(issue, dict) and issue.get("reason") in
+                      {"missing_column", "table_columns_unavailable"}]
+            if issues:
+                lines += [_reference_issue(issue, data["document_artifacts"]) for issue in issues] + [""]
         if result["limitations"]:
             lines += ["**Limitations and uncertainty:**", ""]
             lines += [f"- {_cell(x)}" for x in result["limitations"]]

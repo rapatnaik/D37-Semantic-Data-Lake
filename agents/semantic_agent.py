@@ -61,7 +61,7 @@ def request_completion(prompt: str | list[dict], model, *, endpoint=DEFAULT_ENDP
         data=json.dumps(payload).encode("utf-8"),
         headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
     )
-    with urlopen(request, timeout=120) as response:
+    with urlopen(request, timeout=300) as response:
         completion = json.load(response)
     return completion["choices"][0]["message"]["content"]
 

@@ -28,9 +28,9 @@ uv run --locked d37-agent runs "$demo_dir"
 ```
 
 The run prints the path to `reports/revision-001/report.md` under
-`DATA_DIR/.d37-agent/runs/<run-id>/`. The report shows observed values,
-dictionary definitions with citations, and meanings that need verification.
-The run directory also contains versioned JSON evidence and a marimo notebook.
+`DATA_DIR/.d37-agent/runs/<run-id>/`. The report links to the versioned semantic JSON, which records observed values,
+cited dictionary definitions, and meanings that need verification. The run
+directory also contains a marimo notebook.
 
 To test resume, change `1 = pending` to `1 = active` in
 `$demo_dir/dictionary_b.txt` and resume the run.

@@ -37,18 +37,25 @@ Use an inventory-relative table path or a filename that is unique among the
 tables. Use `./status.csv` to specify a root-level table when its filename is
 shared. Column names are case-sensitive.
 
-The report and versioned JSON profile show measured counts, cited definitions,
-conflicts, and unresolved values. Complete frequency summaries cover up to 20
-distinct non-null values in the profiled rows. The report identifies sampled
-counts, incomplete dictionary extraction, and frequency limits. To try the
+The report links to the versioned semantic JSON profile. The profile records
+measured counts, cited definitions, conflicts, unresolved values, and coverage
+limits. Complete frequency summaries cover up to 20 distinct non-null values
+in the profiled rows. To try the
 six-row demo, copy `examples/status_dictionary_demo` to a temporary directory
 and run `d37-agent run` on the copy. Change `1 = pending` to `1 = active` in
 `dictionary_b.txt` and resume the same run to clear the conflict for code 1.
 
 The semantic agent sends table metadata to `qwen3` by default
 when credentials are available, including for tables without dictionaries.
-The report labels model descriptions and hypotheses alongside the cited
-dictionary findings. For an offline run, pass `--no-model` or set
+Each table request covers up to five columns. Batches within a table run concurrently
+(up to `concurrent_model_requests`, default 3) and each uses one request from
+the run budget. The model HTTP timeout is 300 seconds. Each reply must contain exactly
+the requested column names.
+The agent merges validated replies by column name into one semantic profile
+per table. The report identifies failed or skipped batches alongside the
+interpretations that succeeded.
+The report labels model descriptions and hypotheses and links to the semantic
+JSON for cited dictionary findings. For an offline run, pass `--no-model` or set
 `interpret_semantics = false` in the model settings.
 
 ## TIFF interpretation
@@ -81,7 +88,7 @@ hash_inputs = true            # SHA-256 inputs for change detection and reproduc
 run_seconds = 900             # 15 minutes per invocation
 local_workers = 4             # tool worker processes
 custom_code_workers = 1       # 0 disables generated code; at most 1
-concurrent_model_requests = 2
+concurrent_model_requests = 3
 model_requests_per_run = 30
 repair_attempts = 2
 analysis_timeout_seconds = 120

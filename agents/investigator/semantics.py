@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal, InvalidOperation
 from pathlib import PurePosixPath
 
@@ -176,21 +177,41 @@ def _interpret(source: SourceRef, measured: dict, budget: ModelBudget, config: C
     key = config.api_key()
     if key is None:
         return {"status": "skipped", "reason": f"No model credentials in ${settings.api_key_env}."}
-    context = {
-        "dataset": source.relative_path, "row_count": measured["row_count"], "columns": columns,
-        "potential_keys": [name for name, facts in columns.items() if facts.get("candidate_key")],
-    }
-    try:
-        prompt = semantic_agent.build_table_prompt(context)
-        with budget.request():
-            reply = semantic_agent.request_completion(prompt, settings.name, endpoint=settings.endpoint, api_key=key)
-        interpretations = semantic_agent.parse_columns(reply, columns)
-    except BudgetExhausted as error:
-        return {"status": "skipped", "reason": str(error)}
-    except Exception as error:
-        return {"status": "failed", "reason": f"Model interpretation failed ({type(error).__name__})."}
-    return {
-        "status": "complete", "model": settings.name,
-        "columns": {name: {field: entry[field] for field in semantic_agent.COLUMN_FIELDS}
-                    for name, entry in interpretations.items()},
-    }
+
+    def interpret_batch(batch):
+        context = {
+            "dataset": source.relative_path, "row_count": measured["row_count"], "columns": batch,
+            "potential_keys": [name for name, facts in batch.items() if facts.get("candidate_key")],
+        }
+        try:
+            prompt = semantic_agent.build_table_prompt(context)
+            with budget.request():
+                reply = semantic_agent.request_completion(prompt, settings.name, endpoint=settings.endpoint, api_key=key)
+            entries = semantic_agent.parse_columns(reply, batch)
+        except BudgetExhausted as error:
+            return {}, {"columns": list(batch), "status": "skipped", "reason": str(error)}
+        except Exception as error:
+            return {}, {"columns": list(batch), "status": "failed",
+                        "reason": f"Model interpretation failed ({type(error).__name__})."}
+        return {name: {field: entries[name][field] for field in semantic_agent.COLUMN_FIELDS}
+                for name in batch}, None
+
+    items = list(columns.items())
+    batch_size = 5
+    batches = [dict(items[start:start + batch_size]) for start in range(0, len(items), batch_size)]
+    workers = min(len(batches), config.limits.concurrent_model_requests)
+    interpretations = {}
+    issues = []
+    # Only the caller merges results. map yields them in batch order.
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for entries, issue in pool.map(interpret_batch, batches):
+            interpretations.update(entries)
+            if issue:
+                issues.append(issue)
+
+    if not issues:
+        return {"status": "complete", "model": settings.name, "columns": interpretations}
+    if interpretations:
+        return {"status": "partial", "model": settings.name, "columns": interpretations, "batch_issues": issues}
+    failure = next((issue for issue in issues if issue["status"] == "failed"), issues[0])
+    return {"status": failure["status"], "reason": failure["reason"], "batch_issues": issues}

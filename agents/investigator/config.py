@@ -26,7 +26,7 @@ class Limits:
     run_seconds: int = 15 * 60
     local_workers: int = 4
     custom_code_workers: int = 1
-    concurrent_model_requests: int = 2
+    concurrent_model_requests: int = 3
     model_requests_per_run: int = 30
     repair_attempts: int = 2
     tool_timeout_seconds: int = 300

@@ -46,7 +46,7 @@ class ReportingTests(unittest.TestCase):
         label = cid.removeprefix("component_")[:8] + "…"
         self.assertIn("| Component ID |", report)
         self.assertIn(f"| `{label}` |", report)
-        self.assertIn(f"### Component `{label}`", report)
+        self.assertIn("### study.txt", report)
         self.assertNotIn(f"`{cid}`", report)
 
     def test_component_labels_expand_to_distinguish_matching_prefixes(self):
@@ -60,7 +60,7 @@ class ReportingTests(unittest.TestCase):
         report = render_report(self.run)
         for digit in ("a", "b"):
             self.assertIn(f"| `01234567{digit}…` |", report)
-            self.assertIn(f"### Component `01234567{digit}…`", report)
+        self.assertEqual(report.count("### study.txt"), 3)
 
     def test_notebook_syntax_and_no_cloud_or_code_execution(self):
         source = render_notebook(self.run)

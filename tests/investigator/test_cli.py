@@ -32,7 +32,7 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(limits.run_seconds, 900)
         self.assertEqual(limits.local_workers, 4)
         self.assertEqual(limits.custom_code_workers, 1)
-        self.assertEqual(limits.concurrent_model_requests, 2)
+        self.assertEqual(limits.concurrent_model_requests, 3)
         self.assertEqual(limits.model_requests_per_run, 30)
         self.assertEqual(limits.repair_attempts, 2)
         self.assertEqual(Config().execution.backend, "docker")
